@@ -7,77 +7,102 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class video1 extends OpenCvPipeline {
+
     Telemetry telemetry;
+    //Creating a Matrix
     Mat mat = new Mat();
-    String locationString;
+    //Pozitions for the obj
+    String LocationString;
     public String location;
 
-    static final Rect ROI = new Rect(
+    //ROI = region of interest
+    /**Region of intrest for the camera**/
+    static final Rect LEFT_ROI = new Rect(
             new Point(0, 90),
             new Point(40, 180));
+    static final Rect MID_ROI = new Rect(
+            new Point(125, 90),
+            new Point(180, 180));
+    static final Rect RIGHT_ROI = new Rect(
+            new Point(280, 90),
+            new Point(320, 180));
+    //Treshold
+    static double PERCENT_COLOR_THRESHOLD = 0.2;
 
-    static double PERCENT_COLOR_TRESH = 0.2;
-
-    public video1(Telemetry t){
+    public video1(Telemetry t) {
         telemetry = t;
     }
-    @Override
-    public Mat processFrame(Mat input){
 
+    @Override
+    public Mat processFrame(Mat input) {
+        //transforming the video from BGR to HSV
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
-        //CULUARE 1 albastru
+        /**THE COLOR FOR THE OBJ**/
+        /*
+        low 110,50,50
+        high 130,255,255
+        */
+        Scalar lowHSV = new Scalar(100,150,0);
+        Scalar highHSV = new Scalar(140,255,255);
 
-        Scalar lowHSV1 = new Scalar(100,150,0);
-        Scalar highHSV1 = new Scalar(140,255,255);
+        // adding the treshold to the matrix
+        Core.inRange(mat, lowHSV, highHSV, mat);
 
-        Core.inRange(mat,lowHSV1,highHSV1,mat);
+        // Creeatin 3 sub matrixes
+        Mat left = mat.submat(LEFT_ROI);//sub matrix = submat
+        Mat right = mat.submat(RIGHT_ROI);
+        Mat mid = mat.submat(MID_ROI);
 
-        Mat submat1 = mat.submat(ROI);
-        double cevaValue1 = Core.sumElems(submat1).val[0] / ROI.area()/255;
-        submat1.release();
-        telemetry.addData("valoare1", (int) Core.sumElems(submat1).val[0]);
-        telemetry.addData("procent ceva1", Math.round(cevaValue1 * 100)+"%");
-        boolean ceva1 = cevaValue1 > PERCENT_COLOR_TRESH;
+        //determing the precentige of the white pixels in each submatrix
+        double leftValue = Core.sumElems(left).val[0] / LEFT_ROI.area() / 255;
+        double rightValue = Core.sumElems(right).val[0] / RIGHT_ROI.area() / 255;
+        double midValue = Core.sumElems(mid).val[0] / MID_ROI.area() / 255;
+        //releasing the sub matrixes
+        left.release();
+        right.release();
+        mid.release();
 
+        //showing data on the phone screen
+        telemetry.addData("valoare stanga", (int) Core.sumElems(left).val[0]);
+        telemetry.addData("Valoare dreapta", (int) Core.sumElems(right).val[0]);
+        telemetry.addData("valoare mijloc", (int) Core.sumElems(mid).val[0]);
+        telemetry.addData("procent stanga", Math.round(leftValue * 100) + "%");
+        telemetry.addData("procent dreapta", Math.round(rightValue * 100) + "%");
+        telemetry.addData("procent mijloc", Math.round(midValue * 100) + "%");
 
-        //CULUARE 2 sper ca ii verde CA NU POT TESTA
-        Scalar lowHSV2 = new Scalar(36, 25, 25);
-        Scalar highHSV2 = new Scalar(70, 255,255);
+        // if the precentige of the white pixels is bigger then the treshold
+        boolean cevaLeft = leftValue > PERCENT_COLOR_THRESHOLD;
+        boolean cevaRight = rightValue > PERCENT_COLOR_THRESHOLD;
+        boolean cevaMid = midValue > PERCENT_COLOR_THRESHOLD;
 
-        Core.inRange(mat,lowHSV2,highHSV2,mat);
-
-        Mat submat2 = mat.submat(ROI);
-        double cevaValue2 = Core.sumElems(submat1).val[0] / ROI.area()/255;
-        telemetry.addData("valoare2", (int) Core.sumElems(submat1).val[0]);
-        telemetry.addData("procent ceva2", Math.round(cevaValue2 * 100)+"%");
-        submat1.release();
-        boolean ceva2 = cevaValue2> PERCENT_COLOR_TRESH;
-
-
-        //CULUARE 3 sper ca ii rosu TE IMPLOR CA NU MAI VREAU SA CAUT
-        Scalar lowHSV3 = new Scalar(161,155,84);
-        Scalar highHSV3 = new Scalar(179,255,255);
-
-        Core.inRange(mat,lowHSV3,highHSV3,mat);//1
-
-        Mat submat3 = mat.submat(ROI);
-        double cevaValue3= Core.sumElems(submat3).val[0] / ROI.area()/255;
-        submat1.release();
-        telemetry.addData("valoare3", (int) Core.sumElems(submat3).val[0]);
-        telemetry.addData("procent ceva3", Math.round(cevaValue3 * 100)+"%");
-        boolean ceva3 = cevaValue3 > PERCENT_COLOR_TRESH;
-
+        if (cevaRight) {
+            location = "RIGHT";
+            telemetry.addData("Locatie", "DREAPTA");
+        } else if (cevaLeft) {
+            location = "LEFT";
+            telemetry.addData("Locatie", "STANGA");
+        } else if(cevaMid) {
+            location = "MID";
+            telemetry.addData("Locatie", "MIJLOC");
+        }
+        if(!cevaRight && !cevaLeft && !cevaMid){
+            location = "NONE";
+            telemetry.addData("Locatie", "NIMIC");
+        }
         telemetry.update();
-        Imgproc.cvtColor(mat,mat,Imgproc.COLOR_GRAY2RGB);
+        // transforming the matrix from GRAY to BGR
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_GRAY2RGB);
 
-        Imgproc.rectangle(mat, ROI, new Scalar(0, 255, 0));
+        // creeating 3 rectangles for the roi
+        Imgproc.rectangle(mat, LEFT_ROI, new Scalar(0, 255, 0));// (0, 255, 0) == GREEN
+        Imgproc.rectangle(mat, MID_ROI, new Scalar(0, 255, 0));
+        Imgproc.rectangle(mat, RIGHT_ROI, new Scalar(0, 255, 0));
 
         return mat;
-
     }
-
 }

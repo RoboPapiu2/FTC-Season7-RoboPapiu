@@ -16,8 +16,8 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 //640x480
 //1280x720
 //1920x1080
-@Disabled
-@TeleOp(name = "camera2")
+
+@TeleOp(name = "ceva camera")
 public class camera2 extends LinearOpMode {
     //    OpenCvCamera camera;
     @Override
@@ -47,11 +47,11 @@ public class camera2 extends LinearOpMode {
             @Override
             public void onError(int errorCode) {}
         });
-        waitForStart();
+        while (true)
+        {
 
-        while (opModeIsActive()){
-            sleep(50);
         }
+        //camera.stopStreaming();
     }
-}
 
+}

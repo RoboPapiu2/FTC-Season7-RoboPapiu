@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -16,18 +17,17 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-
 @TeleOp
 public class video3 extends LinearOpMode
 {
     OpenCvInternalCamera phoneCam;
     DETERMINATION pipeline;
-    public video3(Telemetry t) {
-        telemetry = t;
-    }
+//    public video3(Telemetry t) {
+//        telemetry = t;
+//    }
     @Override
-    public void runOpMode()
-    {
+    public void runOpMode() throws InterruptedException {
+        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         pipeline = new DETERMINATION();
@@ -147,6 +147,7 @@ public class video3 extends LinearOpMode
                         region2_pointB, // Second point which defines the rectangle
                         BLUE, // The color the rectangle is drawn in
                         -1); // Negative thickness means solid fill
+
             }
 
             /*
