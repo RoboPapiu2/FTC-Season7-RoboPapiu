@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 //640x480
 //1280x720
 //1920x1080
-
+//balls
 @TeleOp(name = "ceva camera")
 public class camera2 extends LinearOpMode {
     //    OpenCvCamera camera;
