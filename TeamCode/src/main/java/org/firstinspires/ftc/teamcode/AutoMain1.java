@@ -103,7 +103,7 @@ public class AutoMain1 extends LinearOpMode {
                 .build();
 
         Trajectory ConesToMidJ = drive.trajectoryBuilder(MidToCones.end(), true)
-                .splineToSplineHeading(new Pose2d(-26.5, -18.5, Math.toRadians(315)), 5.5, //todo: fine tune speed to go faster, prev 28
+                .splineToSplineHeading(new Pose2d(-26.5, -17.5, Math.toRadians(315)), 5.5, //todo: fine tune speed to go faster, prev 28
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -175,6 +175,7 @@ public class AutoMain1 extends LinearOpMode {
                     runToPosition(1, "down");
                 })
                 .build();
+
 
 
         waitForStart();

@@ -20,11 +20,19 @@ public class MeepMeepTesting {
                                 /**start to low junction**/
                                 .lineToLinearHeading(new Pose2d(-28, -52, Math.toRadians(45)))
 //                                .splineTo(new Vector2d(-34,-30), Math.toRadians(90))
+//                                .setReversed(true)
+                                .lineToLinearHeading(new Pose2d(-35.5, -60, Math.toRadians(60)))
+                                .lineToLinearHeading(new Pose2d(-35.5, 2, Math.toRadians(90)))
                                 .setReversed(true)
-//                                .lineToLinearHeading(new Pose2d(-35.5, -60, Math.toRadians(45)))
-//                                .lineToLinearHeading(new Pose2d(-35.5, -25, Math.toRadians(45)))
-                                .splineToSplineHeading(new Pose2d(-35.5, -25, Math.toRadians(45)), 1.5)
-                                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2)
+//                                .splineToSplineHeading(new Pose2d(-40, -5, Math.toRadians(90)), 1)
+                                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3)
+
+
+
+
+
+//                                .splineToSplineHeading(new Pose2d(-35.5, -25, Math.toRadians(45)), 1.5)
+//                                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2)
 //                                .setReversed(false)
 //                                .splineTo(new Vector2d(-61,-10), Math.toRadians(180))
                                 .setReversed(true)
