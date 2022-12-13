@@ -193,8 +193,6 @@ public class TeleOPDrive extends LinearOpMode {
             switch(level){
                 case 2:
                     ticks = (int)(24 * TICKS_PER_CM_Z);
-                    isOpen=true;
-                    brateCleste();
                     robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - ticks);
                     break;
                 case 3:
@@ -210,8 +208,6 @@ public class TeleOPDrive extends LinearOpMode {
             switch(level){
                 case 1:
                     robot.bratz.setTargetPosition(0);
-                    isOpen=true;
-                    brateCleste();
                     break;
                 case 2:
                     ticks = (int)(18 * TICKS_PER_CM_Z);

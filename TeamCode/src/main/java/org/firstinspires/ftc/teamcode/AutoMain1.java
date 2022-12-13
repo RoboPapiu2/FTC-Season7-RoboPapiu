@@ -295,7 +295,6 @@ public class AutoMain1 extends LinearOpMode {
             switch(level){
                 case 1:
                     robot.bratz.setTargetPosition(0);
-                    brateCleste("closed");
                     break;
                 case 2:
                     ticks = (int)((18+24) * TICKS_PER_CM_Z);
