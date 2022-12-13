@@ -25,7 +25,7 @@ public class video3 extends LinearOpMode
     DETERMINATION pipeline;
 //    public video3(Telemetry t) {
 //        telemetry = t;
-//    }
+//    } ass
     @Override
     public void runOpMode() throws InterruptedException {
         WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
