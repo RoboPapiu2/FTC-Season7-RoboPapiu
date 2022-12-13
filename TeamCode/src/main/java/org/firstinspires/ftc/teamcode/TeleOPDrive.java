@@ -142,30 +142,26 @@ public class TeleOPDrive extends LinearOpMode {
         if(Objects.equals(direction, "up")){
             try {
                 // Limit movement so that it doesn't go above max height
-                liftCountZ++;
 
-                if (liftCountZ > 4) {
-                    liftCountZ = 4;
-                }
-                else {
+                if (liftCountZ < 4) {
                     runToPosition(liftCountZ, "up");
                 }
-                TimeUnit.MILLISECONDS.sleep(300);
+                else liftCountZ=4;
+
+                TimeUnit.MILLISECONDS.sleep(500);
             } catch(InterruptedException e){
                 Thread.currentThread().interrupt();
             }
         } else if(Objects.equals(direction, "down")){
             try {
                 // Limit movement so that it doesn't go below min height
-                liftCountZ--;
-
-                if (liftCountZ < 1) {
-                    liftCountZ = 1;
-                }
-                else {
+                if (liftCountZ > 1) {
                     runToPosition(liftCountZ, "down");
                 }
-                TimeUnit.MILLISECONDS.sleep(300);
+                else {
+                    liftCountZ=1;
+                }
+                TimeUnit.MILLISECONDS.sleep(500);
             } catch (InterruptedException e){
                 Thread.currentThread().interrupt();
             }
@@ -190,6 +186,8 @@ public class TeleOPDrive extends LinearOpMode {
     public void runToPosition(int level, String rotation) {
         int ticks;
         if(rotation == "up"){
+            liftCountZ++;
+            level = liftCountZ;
             switch(level){
                 case 2:
                     ticks = (int)(24 * TICKS_PER_CM_Z);
@@ -205,6 +203,8 @@ public class TeleOPDrive extends LinearOpMode {
                     break;
             }
         } else if(rotation == "down"){
+            liftCountZ--;
+            level = liftCountZ;
             switch(level){
                 case 1:
                     robot.bratz.setTargetPosition(0);

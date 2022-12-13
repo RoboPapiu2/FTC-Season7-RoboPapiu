@@ -83,7 +83,7 @@ public class AutoMain2 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2)
+                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2)
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -126,7 +126,7 @@ public class AutoMain2 extends LinearOpMode {
 
 
         Trajectory ConesToMidJ = drive.trajectoryBuilder(MidToCones.end(), true)
-                .splineToSplineHeading(new Pose2d(-26.5, -17.5, Math.toRadians(315)), 5.5, //todo: fine tune speed to go faster, prev 28
+                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5, //todo: fine tune speed to go faster, prev 28
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -136,7 +136,7 @@ public class AutoMain2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones2 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2,
+                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2,
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -148,7 +148,7 @@ public class AutoMain2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones3 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2,
+                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2,
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -210,6 +210,7 @@ public class AutoMain2 extends LinearOpMode {
                     break;
                 case TRAJ_2:
                     if(drive.isBusy()){
+                        brateCleste("open");
                         if(!robot.digitalTouch.getState()){ //if button is pressed against the wall
                             drive.breakFollowing();
                             /**  5th cone  */
@@ -250,11 +251,9 @@ public class AutoMain2 extends LinearOpMode {
                         sleep(100);
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
-                            coneOrder++;
                             drive.followTrajectoryAsync(MidJToCones2);
                         } else if(coneOrder==2){
                             currentState = State.TRAJ4_2;
-                            coneOrder++;
                             drive.followTrajectoryAsync(MidJToCones3);
                         } else if(coneOrder==3){
                             coneOrder++;
@@ -307,6 +306,7 @@ public class AutoMain2 extends LinearOpMode {
                             telemetry.update();
                         }
                         currentState = State.TRAJ_3REPEAT;
+                        coneOrder=2;
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
                     break;
@@ -342,6 +342,7 @@ public class AutoMain2 extends LinearOpMode {
                             telemetry.update();
                         }
                         currentState = State.TRAJ_3REPEAT;
+                        coneOrder=3;
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
                     break;
@@ -367,7 +368,7 @@ public class AutoMain2 extends LinearOpMode {
             telemetry.addData("coneOrder:", coneOrder);
             telemetry.addData("Current trajectory: ", drive.getCurrentTrajectory());
             telemetry.addData("Current state:", currentState);
-            telemetry.addData("Button pressed:", robot.digitalTouch.getState());
+            telemetry.addData("Button pressed:", !robot.digitalTouch.getState());
             telemetry.update();
         }
     }
