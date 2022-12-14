@@ -32,7 +32,7 @@ public class Minimap extends AutoMain1{
 
     public void minimap() {
         positionX = drive.getPoseEstimate().getX();
-        positionY = drive.getPoseEstimate().getY();
+        positionY = drive.getPoseEstimate().getY();   //-Aici pt coordonate
 
         if(positionX < squareLength)
             cx = squareLength / positionX;
@@ -42,7 +42,7 @@ public class Minimap extends AutoMain1{
             cy = squareLength / positionY;
         else cy = positionY / squareLength;
 
-        if(gamepad1.y){                 // up
+        if(gamepad1.y){                 /**up**/
             if(positionY < 0) {
                 if (positionY > -squareLength)
                     goToY = 0 + precision;
@@ -55,7 +55,7 @@ public class Minimap extends AutoMain1{
                 if (positionY > squareLength)
                     goToY = squareLength * (cy + 1) + precision;
             }
-            if(gamepad1.x) {             //left
+            if(gamepad1.x) {             /**left**/
                 if(positionX < 0) {
                     if (positionX > -squareLength)
                         goToX = - squareLength + precision;
@@ -71,7 +71,7 @@ public class Minimap extends AutoMain1{
                 Pose2d StartPos = new Pose2d(goToX, goToX, Math.toRadians(90));
                 drive.setPoseEstimate(StartPos);
                 Trajectory GoToJunction = drive.trajectoryBuilder(StartPos)
-                        .splineTo(new Vector2d(goToX, goToY), Math.toRadians(135))
+                        .lineToLinearHeading(new Pose2d(goToX, goToY, Math.toRadians(135)))
                         .addDisplacementMarker(0, ()->{
                             if(goToX == -2 * squareLength + precision || goToX == precision || goToX == 2 * squareLength + precision)
                                 if(goToY == -2 * squareLength + precision || goToY == precision || goToY == 2 * squareLength + precision)
@@ -91,7 +91,7 @@ public class Minimap extends AutoMain1{
                         .build();
                 drive.followTrajectory(GoToJunction);
             }
-            if(gamepad1.b){             ///right
+            if(gamepad1.b){             /**right**/
                 if(positionX < 0) {
                     if (positionX > -squareLength)
                         goToX = 0 + precision;
@@ -127,7 +127,7 @@ public class Minimap extends AutoMain1{
                 drive.followTrajectory(GoToJunction);
             }
         }
-        if(gamepad1.a){                 //down
+        if(gamepad1.a){                 /**down**/
             if(positionY < 0) {
                 if (positionY > -squareLength)
                     goToY = -squareLength + precision;
@@ -140,7 +140,7 @@ public class Minimap extends AutoMain1{
                 if (positionY > squareLength)
                     goToY = squareLength * (cy + 1) + precision;
             }
-            if(gamepad1.x){             ///left
+            if(gamepad1.x){             /**left**/
                 if(positionX < 0) {
                     if (positionX > -squareLength)
                         goToX = - squareLength + precision;
@@ -154,10 +154,10 @@ public class Minimap extends AutoMain1{
                         goToX = cx * squareLength + precision;
                 }
 
-                Pose2d StartPos = new Pose2d(goToX, goToX, Math.toRadians(-90));       // || 270?
+                Pose2d StartPos = new Pose2d(goToX, goToY, Math.toRadians(-90));       // || 270?
                 drive.setPoseEstimate(StartPos);
                 Trajectory GoToJunction = drive.trajectoryBuilder(StartPos)
-                        .splineTo(new Vector2d(goToX, goToY), Math.toRadians(-135))
+                        .lineToLinearHeading(new Pose2d(goToX, goToY, Math.toRadians(-135)))
                         .addDisplacementMarker(0, ()->{
                             if(goToX == -2 * squareLength + precision || goToX == precision || goToX == 2 * squareLength + precision)
                                 if(goToY == -2 * squareLength + precision || goToY == precision || goToY == 2 * squareLength + precision)
@@ -177,7 +177,7 @@ public class Minimap extends AutoMain1{
                         .build();
                 drive.followTrajectory(GoToJunction);
             }
-            if(gamepad1.b){             ///right
+            if(gamepad1.b){             /**right**/
                 if(positionX < 0) {
                     if (positionX > -squareLength)
                         goToX = 0 + precision;
@@ -190,10 +190,10 @@ public class Minimap extends AutoMain1{
                     if(positionX > squareLength)
                         goToX = squareLength * (cx + 1) + precision;
                 }
-                Pose2d StartPos = new Pose2d(goToX, goToX, Math.toRadians(-90));
+                Pose2d StartPos = new Pose2d(goToX, goToY, Math.toRadians(-90));
                 drive.setPoseEstimate(StartPos);
                 Trajectory GoToJunction = drive.trajectoryBuilder(StartPos)
-                        .splineTo(new Vector2d(goToX, goToY), Math.toRadians(-45))
+                        .lineToLinearHeading(new Pose2d(goToX, goToY, Math.toRadians(-45)))
                         .addDisplacementMarker(0, ()->{
                             if(goToX == -2 * squareLength + precision || goToX == precision || goToX == 2 * squareLength + precision)
                                 if(goToY == -2 * squareLength + precision || goToY == precision || goToY == 2 * squareLength + precision)

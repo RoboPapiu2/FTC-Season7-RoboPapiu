@@ -77,6 +77,7 @@ public class TeleOPDrive extends LinearOpMode {
             joystick_r_x = gamepad2.right_stick_x;
             joystick_r_y = gamepad2.right_stick_y;
             joystick_l_x = gamepad2.left_stick_x;
+            float joystic_r_trigger = gamepad2.right_trigger+1;
             isMoving= joystick_l_x != 0 && joystick_r_y != 0 && joystick_l_y != 0 && joystick_r_x != 0;
             /** Base Movement**/
 
@@ -84,12 +85,12 @@ public class TeleOPDrive extends LinearOpMode {
 //            if((generatePoints(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY()) && isInBounds) || isOverridden){
 
                 /// Limit speed while left bumper is pressed
-                if(gamepad2.left_bumper){
+                if(joystic_r_trigger>1){
                     drive.setWeightedDrivePower(
                             new Pose2d(
-                                    -joystick_l_y/3,
-                                    -joystick_l_x/3,
-                                    -joystick_r_x/10
+                                    -joystick_l_y/(1.5*joystic_r_trigger),
+                                    -joystick_l_x/(1.5*joystic_r_trigger),
+                                    -joystick_r_x/(5*joystic_r_trigger)
                             )
                     );
                 } else {
@@ -112,6 +113,7 @@ public class TeleOPDrive extends LinearOpMode {
             if(gamepad2.y)
                 brateCleste();
 
+
             //if(gamepad2.a)
               //  test.minimap();
 
@@ -125,6 +127,7 @@ public class TeleOPDrive extends LinearOpMode {
             telemetry.addData("Cleste position right:", robot.servoRight.getPosition());
             telemetry.addData("Glisiera ticks: ", robot.bratz.getCurrentPosition());
             telemetry.addData("Glisiera target: ", robot.bratz.getTargetPosition());
+            telemetry.addData("Trigger value: ", joystic_r_trigger);
             telemetry.update();
         }
     }
