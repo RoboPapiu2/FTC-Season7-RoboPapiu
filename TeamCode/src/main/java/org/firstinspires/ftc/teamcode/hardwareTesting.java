@@ -65,7 +65,7 @@ public class hardwareTesting {
         if(servoIncrementLvl<1) servoIncrementLvl=1;
         if(servoIncrementLvl>4) servoIncrementLvl=4;
         double A=0.5;
-        switch (servoIncrementLvl) {
+        switch (servoIncrementLvl) { //TODO: finish this sometime
             case 1:
                 A = 0.5;
                 break;
