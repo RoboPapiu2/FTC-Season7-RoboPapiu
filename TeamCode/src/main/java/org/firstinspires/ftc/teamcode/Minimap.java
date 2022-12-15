@@ -21,7 +21,8 @@
 //
 ////TODO: NOT TESTED, 99% won't work
 //
-//public class Minimap extends AutoMain1{
+//public class Minimap extends AutoMain1{ //TODO: NU automain1!! am si schimbat numele fisierului, si normal voi vreti sa puneti LinearOpMode.
+//                                        // Mai mult trebuie sa calculeze asa
 //    //TODO: get current position
 //    // when pressing A, enter automode
 //    // select with Y, X, A, B desired junction
@@ -68,7 +69,7 @@
 //                    if(positionX > squareLength)
 //                        goToX = cx * squareLength + precision;
 //                }
-//                Pose2d StartPos = new Pose2d(goToX, goToX, Math.toRadians(90));
+//                Pose2d StartPos = new Pose2d(goToX, goToY, Math.toRadians(90));
 //                drive.setPoseEstimate(StartPos);
 //                Trajectory GoToJunction = drive.trajectoryBuilder(StartPos)
 //                        .lineToLinearHeading(new Pose2d(goToX, goToY, Math.toRadians(135)))
