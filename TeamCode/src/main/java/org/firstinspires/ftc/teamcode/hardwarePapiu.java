@@ -25,16 +25,6 @@ public class hardwarePapiu {
         hwMap=ahwmap;
 
         /* Motoare Baza */
-        leftFront = hwMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hwMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hwMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hwMap.get(DcMotorEx.class, "rightFront");
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         bratz = hwMap.get(DcMotor.class, "motorZ");
         bratz.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -48,18 +38,6 @@ public class hardwarePapiu {
         digitalTouch.setMode(DigitalChannel.Mode.INPUT);
     }
     public void EncoderReset() {
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         bratz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bratz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }

@@ -51,7 +51,6 @@ public class TeleOPDrive extends LinearOpMode {
         }
     }
 
-
     hardwarePapiu robot = new hardwarePapiu();
     //Minimap test = new Minimap();
     @Override
@@ -113,9 +112,6 @@ public class TeleOPDrive extends LinearOpMode {
             if(gamepad2.y)
                 brateCleste();
 
-
-            //if(gamepad2.a)
-              //  test.minimap();
 
 
             telemetry.addData("lift level bratz: ", liftCountZ);

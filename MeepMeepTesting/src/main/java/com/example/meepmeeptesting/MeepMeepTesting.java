@@ -11,40 +11,68 @@ public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
-        RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
+        RoadRunnerBotEntity botStanga = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(39, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-35.5, -61, Math.toRadians(270)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-35.5, -61, Math.toRadians(90)))
 
-                                /**start to low junction**/
-                                .lineToLinearHeading(new Pose2d(-28, -52, Math.toRadians(45)))
-//                                .splineTo(new Vector2d(-34,-30), Math.toRadians(90))
-//                                .setReversed(true)
-                                .lineToLinearHeading(new Pose2d(-35.5, -55, Math.toRadians(60)))
-                                .lineToLinearHeading(new Pose2d(-35.5, -8, Math.toRadians(90)))
+                                .lineToLinearHeading(new Pose2d(-28, -52, Math.toRadians(45))) //drop cone 1
+
+                                .lineToLinearHeading(new Pose2d(-35.5, -55, Math.toRadians(60))) //pushcone 1
+                                .lineToLinearHeading(new Pose2d(-35.5, -8, Math.toRadians(90))) //2
                                 .setReversed(true)
-//                                .splineToSplineHeading(new Pose2d(-40, -5, Math.toRadians(90)), 1)
-                                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2)
+                                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2) //3
+                                .waitSeconds(1.5)
 
+                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
+                                .waitSeconds(1)
+                                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2) // traj4_1
+                                .waitSeconds(1.5)
 
+                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
+                                .waitSeconds(1)
+                                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2) // traj4_1
+                                .waitSeconds(1.5)
 
+                                .setReversed(false)
 
-
-//                                .splineToSplineHeading(new Pose2d(-35.5, -25, Math.toRadians(45)), 1.5)
-//                                .splineToSplineHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2)
-//                                .setReversed(false)
-//                                .splineTo(new Vector2d(-61,-10), Math.toRadians(180))
-                                .setReversed(true)
-//                                .splineTo(new Vector2d(-52, 0.5), Math.toRadians(0))
-//                                .splineTo(new Vector2d(-27, -9.5), Math.toRadians(225))
-
-                                .splineToSplineHeading(new Pose2d(-26.5, -18.5, Math.toRadians(315)), 5.5)
-                                .splineToLinearHeading(new Pose2d(-62, -10, Math.toRadians(180)), 3.2)
-                                .splineToSplineHeading(new Pose2d(-26.5, -18.5, Math.toRadians(315)), 5.5)
                                 //zone 1
-//                                .splineToSplineHeading(new Pose2d(-60, -4, Math.toRadians(0)), 3.15)
+                                .lineToLinearHeading(new Pose2d(-48, -10, Math.toRadians(180)))
+                                .lineToLinearHeading(new Pose2d(-57, -10, Math.toRadians(270)))
 
+                                .build()
+                );
+
+        RoadRunnerBotEntity botDreapta = new DefaultBotBuilder(meepMeep)
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(39, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(35.5, -61, Math.toRadians(90)))
+
+                                .lineToLinearHeading(new Pose2d(28, -52, Math.toRadians(135))) //drop cone 1
+
+                                .lineToLinearHeading(new Pose2d(35.5, -55, Math.toRadians(125))) //pushcone 1
+                                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90))) //2
+                                .setReversed(true)
+                                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), -0.15) //3
+                                .waitSeconds(1.5)
+
+                                .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 3.7) //traj_3repeat
+                                .waitSeconds(1)
+                                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), 0.15) // traj4_1
+                                .waitSeconds(1.5)
+
+                                .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 3.7) //traj_3repeat
+                                .waitSeconds(1)
+                                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), 0.15) // traj4_1
+                                .waitSeconds(1.5)
+
+                                .setReversed(false)
+
+                                //zone 1
+                                .lineToLinearHeading(new Pose2d(48, -10, Math.toRadians(0)))
+                                .lineToLinearHeading(new Pose2d(57, -10, Math.toRadians(270)))
 
                                 .build()
                 );
@@ -62,7 +90,8 @@ public class MeepMeepTesting {
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(myBot)
+                .addEntity(botStanga)
+                .addEntity(botDreapta)
                 .start();
     }
 }
