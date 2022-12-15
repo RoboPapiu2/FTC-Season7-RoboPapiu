@@ -218,11 +218,7 @@ public class AutoMain2 extends LinearOpMode {
                             sleep(300);
                             runToPosition(2, "up");
                             while(robot.bratz.getCurrentPosition() > -(int)(23 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                telemetry.addData("glisiera busy: ", robot.bratz.isBusy());
-                                telemetry.addData("current position: ", robot.bratz.getCurrentPosition());
-                                telemetry.addData("target position: ", robot.bratz.getTargetPosition());
-                                telemetry.addData("while target: ", (int)(23 * TICKS_PER_CM_Z));
-                                telemetry.update();
+                                //do nothing
                             }
                             currentState = State.TRAJ_3REPEAT;
                             drive.followTrajectoryAsync(ConesToMidJ);
@@ -234,11 +230,7 @@ public class AutoMain2 extends LinearOpMode {
                         sleep(300);
                         runToPosition(2, "up");
                         while(robot.bratz.getCurrentPosition() > -(int)(23 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            telemetry.addData("glisiera busy: ", robot.bratz.isBusy());
-                            telemetry.addData("current position: ", robot.bratz.getCurrentPosition());
-                            telemetry.addData("target position: ", robot.bratz.getTargetPosition());
-                            telemetry.addData("while target: ", (int)(23 * TICKS_PER_CM_Z));
-                            telemetry.update();
+                            //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
                         drive.followTrajectoryAsync(ConesToMidJ);
@@ -283,11 +275,7 @@ public class AutoMain2 extends LinearOpMode {
                             sleep(300);
                             runToPosition(2, "up");
                             while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                telemetry.addData("glisiera busy: ", robot.bratz.isBusy());
-                                telemetry.addData("current position: ", robot.bratz.getCurrentPosition());
-                                telemetry.addData("target position: ", robot.bratz.getTargetPosition());
-                                telemetry.addData("while target: ", (int)(21 * TICKS_PER_CM_Z));
-                                telemetry.update();
+                                //do nothing
                             }
                             currentState = State.TRAJ_3REPEAT;
                             drive.followTrajectoryAsync(ConesToMidJ);
@@ -299,11 +287,7 @@ public class AutoMain2 extends LinearOpMode {
                         sleep(300);
                         runToPosition(2, "up");
                         while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            telemetry.addData("glisiera busy: ", robot.bratz.isBusy());
-                            telemetry.addData("current position: ", robot.bratz.getCurrentPosition());
-                            telemetry.addData("target position: ", robot.bratz.getTargetPosition());
-                            telemetry.addData("while target: ", (int)(21 * TICKS_PER_CM_Z));
-                            telemetry.update();
+                            //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
                         coneOrder=2;
@@ -319,11 +303,7 @@ public class AutoMain2 extends LinearOpMode {
                             sleep(300);
                             runToPosition(2, "up");
                             while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                telemetry.addData("glisiera busy: ", robot.bratz.isBusy());
-                                telemetry.addData("current position: ", robot.bratz.getCurrentPosition());
-                                telemetry.addData("target position: ", robot.bratz.getTargetPosition());
-                                telemetry.addData("while target: ", (int)(19 * TICKS_PER_CM_Z));
-                                telemetry.update();
+                                //do nothing
                             }
                             currentState = State.TRAJ_3REPEAT;
                             drive.followTrajectoryAsync(ConesToMidJ);
@@ -335,11 +315,7 @@ public class AutoMain2 extends LinearOpMode {
                         sleep(300);
                         runToPosition(2, "up");
                         while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            telemetry.addData("glisiera busy: ", robot.bratz.isBusy());
-                            telemetry.addData("current position: ", robot.bratz.getCurrentPosition());
-                            telemetry.addData("target position: ", robot.bratz.getTargetPosition());
-                            telemetry.addData("while target: ", (int)(19 * TICKS_PER_CM_Z));
-                            telemetry.update();
+                            //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
                         coneOrder=3;
