@@ -35,15 +35,14 @@ public class AutoMain2 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        robot.init(hardwareMap);
+        robot.EncoderReset();
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         String POSITION = "left";
 
         Pose2d StartBottom = new Pose2d(-35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartBottom);
-
-        robot.init(hardwareMap);
-        robot.EncoderReset();
         //pt inchis cleste
         robot.servoLeft.setPosition(0.07);
         robot.servoRight.setPosition(0.32);

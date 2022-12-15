@@ -13,9 +13,9 @@ public class TestAutoAnything extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         hardwarePapiu robot = new hardwarePapiu();
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         robot.init(hardwareMap);
         robot.EncoderReset();
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         waitForStart();
 
