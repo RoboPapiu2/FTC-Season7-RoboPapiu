@@ -28,7 +28,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
     }
     State currentState = State.IDLE;
 
-    int coneOrder = 1;
+    int coneOrder = 2;
     Trajectory MidJToPos12;
     Trajectory PushCone2;
     Trajectory PushCone3;
@@ -73,7 +73,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), -0.15)
+                .splineToLinearHeading(new Pose2d(62.5, -10, Math.toRadians(0)), -0.15)
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -200,12 +200,13 @@ public class AutoMainDreapta2 extends LinearOpMode {
                         sleep(100);
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
+                            coneOrder++;
                             drive.followTrajectoryAsync(MidJToCones2);
                         } else if(coneOrder==2){
                             currentState = State.TRAJ4_2;
+                            coneOrder++;
                             drive.followTrajectoryAsync(MidJToCones3);
                         } else if(coneOrder==3){
-                            coneOrder++;
                             if(POSITION =="left"){
                                 currentState = State.TRAJ_POS1;
                                 drive.followTrajectoryAsync(MidJtoPos11);
@@ -247,7 +248,6 @@ public class AutoMainDreapta2 extends LinearOpMode {
                             //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
-                        coneOrder=2;
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
                     break;
@@ -275,7 +275,6 @@ public class AutoMainDreapta2 extends LinearOpMode {
                             //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
-                        coneOrder=3;
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
                     break;

@@ -22,17 +22,17 @@ public class MeepMeepTesting {
                                 .lineToLinearHeading(new Pose2d(-35.5, -55, Math.toRadians(60))) //pushcone 1
                                 .lineToLinearHeading(new Pose2d(-35.5, -8, Math.toRadians(90))) //2
                                 .setReversed(true)
-                                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2) //3
+                                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) //3
                                 .waitSeconds(1.5)
 
                                 .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
                                 .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2) // traj4_1
+                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) // traj4_1
                                 .waitSeconds(1.5)
 
                                 .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
                                 .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(-62.5, -10, Math.toRadians(180)), 3.2) // traj4_1
+                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) // traj4_1
                                 .waitSeconds(1.5)
 
                                 .setReversed(false)
@@ -55,17 +55,17 @@ public class MeepMeepTesting {
                                 .lineToLinearHeading(new Pose2d(35.5, -55, Math.toRadians(125))) //pushcone 1
                                 .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90))) //2
                                 .setReversed(true)
-                                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), -0.15) //3
+                                .splineToLinearHeading(new Pose2d(64.5, -10, Math.toRadians(0)), -0.15) //3
                                 .waitSeconds(1.5)
 
                                 .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 3.7) //traj_3repeat
                                 .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), 0.15) // traj4_1
+                                .splineToSplineHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0.15) // traj4_1
                                 .waitSeconds(1.5)
 
                                 .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 3.7) //traj_3repeat
                                 .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), 0.15) // traj4_1
+                                .splineToSplineHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0.15) // traj4_1
                                 .waitSeconds(1.5)
 
                                 .setReversed(false)

@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
+@TeleOp
 public class MiniMapButBetter extends LinearOpMode {
     hardwarePapiu robot = new hardwarePapiu();
 
@@ -215,7 +216,7 @@ public class MiniMapButBetter extends LinearOpMode {
             // Update the heading controller with our current heading
             headingController.update(poseEstimate.getHeading());
 
-            // Update he localizer
+            // Update the localizer
             drive.getLocalizer().update();
 
             // Send telemetry packet off to dashboard
