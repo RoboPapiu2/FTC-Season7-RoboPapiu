@@ -28,7 +28,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
     }
     State currentState = State.IDLE;
 
-    int coneOrder = 2;
+    int coneOrder = 1;
     Trajectory MidJToPos12;
     Trajectory PushCone2;
     Trajectory PushCone3;
@@ -61,11 +61,14 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
 
         Trajectory PushCone1 = drive.trajectoryBuilder(StartToLow.end())
-                .lineToLinearHeading(new Pose2d(35.5, -55, Math.toRadians(125)))
+                .lineToLinearHeading(new Pose2d(36.5, -56, Math.toRadians(120)))
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone2))
                 .build();
         PushCone2 = drive.trajectoryBuilder(PushCone1.end())
-                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90)),
+                        // Limit speed of trajectory
+                        SampleMecanumDrive.getVelocityConstraint(28, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .addDisplacementMarker(0, ()->{
                     brateCleste("open");
                     runToPosition(1, "down");
@@ -73,7 +76,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToLinearHeading(new Pose2d(62.5, -10, Math.toRadians(0)), -0.15)
+                .splineToLinearHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0)
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -93,10 +96,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones2 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), 0.15,
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToSplineHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0.1)
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -105,10 +105,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones3 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(62.5, -10, Math.toRadians(0)), 0.15,
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToSplineHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0.1)
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -117,18 +114,12 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJtoPos11 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(48, -10, Math.toRadians(0)),
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .addDisplacementMarker(() -> drive.followTrajectoryAsync(MidJToPos12))
+                .lineToLinearHeading(new Pose2d(48, -10, Math.toRadians(0)))
+                .addDisplacementMarker(()-> drive.followTrajectoryAsync(MidJToPos12))
                 .build();
 
         MidJToPos12 = drive.trajectoryBuilder(MidJtoPos11.end())
-                .lineToLinearHeading(new Pose2d(57, -10, Math.toRadians(270)),
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .lineToLinearHeading(new Pose2d(57, -10, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
