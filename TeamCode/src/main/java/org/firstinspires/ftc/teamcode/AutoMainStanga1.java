@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -20,8 +22,29 @@ import java.util.ArrayList;
 
 @Autonomous
 public class AutoMainStanga1 extends LinearOpMode {
-    int taglocation;
     hardwarePapiu robot = new hardwarePapiu();
+
+    OpenCvCamera camera;
+    detectionpipline detectionpipline;
+
+    static final double FEET_PER_METER = 3.28084;
+
+    //calibrare camera
+    //unitate ca pixeli
+    double fx = 578.272;
+    double fy = 578.272;
+    double cx = 402.145;
+    double cy = 221.506;
+
+    // unitate in metri
+    double tagsize = 0.166;
+
+    // id la tag
+    int left = 11;
+    int mid = 12;
+    int right = 13;
+
+    AprilTagDetection tagOfInterest = null;
 
     enum State {
         TRAJ_1,
@@ -49,165 +72,33 @@ public class AutoMainStanga1 extends LinearOpMode {
 
         String POSITION = "left";
 
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        detectionpipline = new detectionpipline(tagsize, fx, fy, cx, cy);
+        camera.setPipeline(detectionpipline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
+
+        telemetry.setMsTransmissionInterval(50);
+
+
         Pose2d StartBottom = new Pose2d(-35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartBottom);
         //pt inchis cleste
         robot.servoLeft.setPosition(0.07);
         robot.servoRight.setPosition(0.32);
-
-        /**CAMERA**/
-
-        class Detectareautomata extends LinearOpMode
-        {
-            OpenCvCamera camera;
-            detectionpipline detectionpipline;
-
-            static final double FEET_PER_METER = 3.28084;
-
-            //calibrare camera
-            //unitate ca pixeli
-            double fx = 578.272;
-            double fy = 578.272;
-            double cx = 402.145;
-            double cy = 221.506;
-
-            // unitate in metri
-            double tagsize = 0.166;
-
-            // id la tag
-            int left = 11;
-            int mid = 12;
-            int right = 13;
-
-            AprilTagDetection tagOfInterest = null;
-
-            @Override
-            public void runOpMode()
-            {
-                int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-                camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-                detectionpipline = new detectionpipline(tagsize, fx, fy, cx, cy);
-                camera.setPipeline(detectionpipline);
-                camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-                {
-                    @Override
-                    public void onOpened()
-                    {
-                        camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
-                    }
-
-                    @Override
-                    public void onError(int errorCode)
-                    {
-
-                    }
-                });
-
-                telemetry.setMsTransmissionInterval(50);
-
-                //init loooooooooooooooooooooooooooooooooop
-
-                while (!isStarted() && !isStopRequested())
-                {
-                    ArrayList<AprilTagDetection> currentDetections = detectionpipline.getLatestDetections();
-
-                    if(currentDetections.size() != 0)
-                    {
-                        boolean tagFound = false;
-
-                        for(AprilTagDetection tag : currentDetections)
-                        {
-                            if(tag.id == left || tag.id == mid || tag.id ==right)
-                            {
-                                tagOfInterest = tag;
-                                tagFound = true;
-                                break;
-                            }
-                        }
-
-                        if(tagFound)
-                        {
-                            telemetry.addLine("AM GASIT!\n\nLOCATIE:");
-                            tagToTelemetry(tagOfInterest);
-                        }
-                        else
-                        {
-                            telemetry.addLine("NU VAD NIMIC :(");
-
-                            if(tagOfInterest == null)
-                            {
-                                telemetry.addLine("(NU AM VAZUT NICIODATA)");
-                            }
-                            else
-                            {
-                                telemetry.addLine("\nAM VAZUT TAGUL LA UN MOMENT DAT; ULTIMA LOCATIE VAZUTA:");
-                                tagToTelemetry(tagOfInterest);
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        telemetry.addLine("NU VAD NIMIC :(");
-
-                        if(tagOfInterest == null)
-                        {
-                            telemetry.addLine("(NU AM VAZUT NICIODATA)");
-                        }
-                        else
-                        {
-                            telemetry.addLine("\nAM VAZUT TAGUL LA UN MOMENT DAT; ULTIMA LOCATIE VAZUTA:");
-                            tagToTelemetry(tagOfInterest);
-                        }
-
-                    }
-
-                    telemetry.update();
-                    sleep(20);
-                }
-
-
-                //telemetry update
-                if(tagOfInterest != null)
-                {
-                    telemetry.addLine("TAG SNAPSHOT:\n");
-                    tagToTelemetry(tagOfInterest);
-                    telemetry.update();
-                }
-                else
-                {
-                    telemetry.addLine("Niciun tag vazut in init loop :(");
-                    telemetry.update();
-                }
-
-                if(tagOfInterest == null || tagOfInterest.id == left){
-                    //left
-                    taglocation = left;
-                }else if(tagOfInterest.id == mid) {
-                    //mid
-                    taglocation = mid;
-                }else if(tagOfInterest.id == right){
-                    //right
-                    taglocation = right;
-                }
-
-
-                while (opModeIsActive()) {sleep(20);}
-            }
-
-            void tagToTelemetry(AprilTagDetection detection)
-            {
-                telemetry.addLine(String.format("\nTag detectat ID=%d", detection.id));
-                telemetry.addLine(String.format("X: %.2f feet", detection.pose.x*FEET_PER_METER));
-                telemetry.addLine(String.format("Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-                telemetry.addLine(String.format("Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-                telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
-                telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
-                telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
-            }
-
-        }
-
 
         /** Build trajectories **/
         Trajectory StartToLow = drive.trajectoryBuilder(StartBottom) //TODO: sugiuc
@@ -294,7 +185,89 @@ public class AutoMainStanga1 extends LinearOpMode {
                     runToPosition(1, "down");
                 })
                 .build();
-        
+        //init loooooooooooooooooooooooooooooooooop
+
+        while (!isStarted() && !isStopRequested())
+        {
+            ArrayList<AprilTagDetection> currentDetections = detectionpipline.getLatestDetections();
+
+            if(currentDetections.size() != 0)
+            {
+                boolean tagFound = false;
+
+                for(AprilTagDetection tag : currentDetections)
+                {
+                    if(tag.id == left || tag.id == mid || tag.id ==right)
+                    {
+                        tagOfInterest = tag;
+                        tagFound = true;
+                        break;
+                    }
+                }
+
+                if(tagFound)
+                {
+                    telemetry.addLine("AM GASIT!\n\nLOCATIE:");
+                    tagToTelemetry(tagOfInterest);
+                }
+                else
+                {
+                    telemetry.addLine("NU VAD NIMIC :(");
+
+                    if(tagOfInterest == null)
+                    {
+                        telemetry.addLine("(NU AM VAZUT NICIODATA)");
+                    }
+                    else
+                    {
+                        telemetry.addLine("\nAM VAZUT TAGUL LA UN MOMENT DAT; ULTIMA LOCATIE VAZUTA:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+                }
+
+            }
+            else
+            {
+                telemetry.addLine("NU VAD NIMIC :(");
+
+                if(tagOfInterest == null)
+                {
+                    telemetry.addLine("(NU AM VAZUT NICIODATA)");
+                }
+                else
+                {
+                    telemetry.addLine("\nAM VAZUT TAGUL LA UN MOMENT DAT; ULTIMA LOCATIE VAZUTA:");
+                    tagToTelemetry(tagOfInterest);
+                }
+
+            }
+
+            telemetry.update();
+            sleep(20);
+        }
+
+
+        //telemetry update
+        if(tagOfInterest != null)
+        {
+            telemetry.addLine("TAG SNAPSHOT:\n");
+            tagToTelemetry(tagOfInterest);
+            telemetry.update();
+        }
+        else
+        {
+            telemetry.addLine("Niciun tag vazut in init loop :(");
+            telemetry.update();
+        }
+
+        if(tagOfInterest == null || tagOfInterest.id == left){
+            POSITION ="left";
+        }else if(tagOfInterest.id == mid) {
+            POSITION="mid";
+        }else if(tagOfInterest.id == right){
+            POSITION="right";
+        }
+
         waitForStart();
 
         if(isStopRequested()) return;
@@ -463,6 +436,17 @@ public class AutoMainStanga1 extends LinearOpMode {
             telemetry.addData("Button pressed:", !robot.digitalTouch.getState());
             telemetry.update();
         }
+    }
+    @SuppressLint("DefaultLocale")
+    void tagToTelemetry(AprilTagDetection detection)
+    {
+        telemetry.addLine(String.format("\nTag detectat ID=%d", detection.id));
+        telemetry.addLine(String.format("X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
     }
     double PI = 3.1415;
     double GEAR_MOTOR_40_TICKS = 1120;

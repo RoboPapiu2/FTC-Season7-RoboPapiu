@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -8,12 +10,41 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import java.util.ArrayList;
 
 @Autonomous
 public class AutoMainDreapta2 extends LinearOpMode {
     hardwarePapiu robot = new hardwarePapiu();
+
+    OpenCvCamera camera;
+    detectionpipline detectionpipline;
+
+    static final double FEET_PER_METER = 3.28084;
+
+    //calibrare camera
+    //unitate ca pixeli
+    double fx = 578.272;
+    double fy = 578.272;
+    double cx = 402.145;
+    double cy = 221.506;
+
+    // unitate in metri
+    double tagsize = 0.166;
+
+    // id la tag
+    int left = 11;
+    int mid = 12;
+    int right = 13;
+
+    AprilTagDetection tagOfInterest = null;
 
     enum State {
         TRAJ_1,
@@ -41,6 +72,27 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
         String POSITION = "left";
 
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        detectionpipline = new detectionpipline(tagsize, fx, fy, cx, cy);
+        camera.setPipeline(detectionpipline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
+
+        telemetry.setMsTransmissionInterval(50);
+
         Pose2d StartBottom = new Pose2d(35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartBottom);
         //pt inchis cleste
@@ -65,7 +117,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone2))
                 .build();
         PushCone2 = drive.trajectoryBuilder(PushCone1.end())
-                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90)),
+                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90)), //prev y8
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(28, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -76,7 +128,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToLinearHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0)
+                .splineToLinearHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0)
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -96,7 +148,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones2 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0.1)
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0.1)
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -105,7 +157,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones3 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(64.5, -10, Math.toRadians(0)), 0.1)
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0.1)
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -137,6 +189,88 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 })
                 .build();
 
+        //init loooooooooooooooooooooooooooooooooop
+
+        while (!isStarted() && !isStopRequested())
+        {
+            ArrayList<AprilTagDetection> currentDetections = detectionpipline.getLatestDetections();
+
+            if(currentDetections.size() != 0)
+            {
+                boolean tagFound = false;
+
+                for(AprilTagDetection tag : currentDetections)
+                {
+                    if(tag.id == left || tag.id == mid || tag.id ==right)
+                    {
+                        tagOfInterest = tag;
+                        tagFound = true;
+                        break;
+                    }
+                }
+
+                if(tagFound)
+                {
+                    telemetry.addLine("AM GASIT!\n\nLOCATIE:");
+                    tagToTelemetry(tagOfInterest);
+                }
+                else
+                {
+                    telemetry.addLine("NU VAD NIMIC :(");
+
+                    if(tagOfInterest == null)
+                    {
+                        telemetry.addLine("(NU AM VAZUT NICIODATA)");
+                    }
+                    else
+                    {
+                        telemetry.addLine("\nAM VAZUT TAGUL LA UN MOMENT DAT; ULTIMA LOCATIE VAZUTA:");
+                        tagToTelemetry(tagOfInterest);
+                    }
+                }
+
+            }
+            else
+            {
+                telemetry.addLine("NU VAD NIMIC :(");
+
+                if(tagOfInterest == null)
+                {
+                    telemetry.addLine("(NU AM VAZUT NICIODATA)");
+                }
+                else
+                {
+                    telemetry.addLine("\nAM VAZUT TAGUL LA UN MOMENT DAT; ULTIMA LOCATIE VAZUTA:");
+                    tagToTelemetry(tagOfInterest);
+                }
+
+            }
+
+            telemetry.update();
+            sleep(20);
+        }
+
+
+        //telemetry update
+        if(tagOfInterest != null)
+        {
+            telemetry.addLine("TAG SNAPSHOT:\n");
+            tagToTelemetry(tagOfInterest);
+            telemetry.update();
+        }
+        else
+        {
+            telemetry.addLine("Niciun tag vazut in init loop :(");
+            telemetry.update();
+        }
+
+        if(tagOfInterest == null || tagOfInterest.id == left){
+            POSITION ="left";
+        }else if(tagOfInterest.id == mid) {
+            POSITION="mid";
+        }else if(tagOfInterest.id == right){
+            POSITION="right";
+        }
 
         waitForStart();
         if(isStopRequested()) return;
@@ -305,6 +439,17 @@ public class AutoMainDreapta2 extends LinearOpMode {
             telemetry.addData("Button pressed:", !robot.digitalTouch.getState());
             telemetry.update();
         }
+    }
+    @SuppressLint("DefaultLocale")
+    void tagToTelemetry(AprilTagDetection detection)
+    {
+        telemetry.addLine(String.format("\nTag detectat ID=%d", detection.id));
+        telemetry.addLine(String.format("X: %.2f feet", detection.pose.x*FEET_PER_METER));
+        telemetry.addLine(String.format("Y: %.2f feet", detection.pose.y*FEET_PER_METER));
+        telemetry.addLine(String.format("Z: %.2f feet", detection.pose.z*FEET_PER_METER));
+        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
+        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
+        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
     }
     double PI = 3.1415;
     double GEAR_MOTOR_40_TICKS = 1120;

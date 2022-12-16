@@ -33,7 +33,7 @@ public class TeleOPDrive extends LinearOpMode {
 
     //Global values.
     boolean isMoving=false, isInBounds=true, isOverridden=false;
-    boolean isOpen=true;
+    boolean isOpen=false;
     double joystick_r_y, joystick_r_x, joystick_l_y, joystick_l_x, xStart=0, yStart=0, headingStart=0;
     int liftCountZ=1;
 
@@ -65,8 +65,8 @@ public class TeleOPDrive extends LinearOpMode {
         /** Default motor values / Reset encoders **/
         robot.bratz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.bratz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.servoLeft.setPosition(0);
-        robot.servoRight.setPosition(0.4);
+        robot.servoLeft.setPosition(0.07);
+        robot.servoRight.setPosition(0.32);
 
         waitForStart();
         while(!isStopRequested()){
