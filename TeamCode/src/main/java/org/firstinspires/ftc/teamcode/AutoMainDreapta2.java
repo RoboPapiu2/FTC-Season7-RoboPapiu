@@ -206,21 +206,6 @@ public class AutoMainDreapta2 extends LinearOpMode {
                             currentState = State.TRAJ4_2;
                             coneOrder++;
                             drive.followTrajectoryAsync(MidJToCones3);
-                        } else if(coneOrder==3){
-                            if(POSITION =="left"){
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            } else if(POSITION == "mid"){
-                                currentState = State.TRAJ_POS2;
-                                drive.followTrajectoryAsync(MidJToPos2);
-                            }
-                            else if(POSITION == "right"){
-                                currentState = State.TRAJ_POS3;
-                                drive.followTrajectoryAsync(MidJToPos3);
-                            } else {
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            }
                         }
                     }
                     break;
@@ -262,8 +247,21 @@ public class AutoMainDreapta2 extends LinearOpMode {
                             while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
                                 //do nothing
                             }
-                            currentState = State.TRAJ_3REPEAT;
-                            drive.followTrajectoryAsync(ConesToMidJ);
+                            coneOrder++;
+                            if(POSITION =="left"){
+                                currentState = State.TRAJ_POS1;
+                                drive.followTrajectoryAsync(MidJtoPos11);
+                            } else if(POSITION == "mid"){
+                                currentState = State.TRAJ_POS2;
+                                drive.followTrajectoryAsync(MidJToPos2);
+                            }
+                            else if(POSITION == "right"){
+                                currentState = State.TRAJ_POS3;
+                                drive.followTrajectoryAsync(MidJToPos3);
+                            } else {
+                                currentState = State.TRAJ_POS1;
+                                drive.followTrajectoryAsync(MidJtoPos11);
+                            }
                         }
                     }
                     if(!drive.isBusy()){
@@ -274,8 +272,21 @@ public class AutoMainDreapta2 extends LinearOpMode {
                         while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
                             //do nothing
                         }
-                        currentState = State.TRAJ_3REPEAT;
-                        drive.followTrajectoryAsync(ConesToMidJ);
+                        coneOrder++;
+                        if(POSITION =="left"){
+                            currentState = State.TRAJ_POS1;
+                            drive.followTrajectoryAsync(MidJtoPos11);
+                        } else if(POSITION == "mid"){
+                            currentState = State.TRAJ_POS2;
+                            drive.followTrajectoryAsync(MidJToPos2);
+                        }
+                        else if(POSITION == "right"){
+                            currentState = State.TRAJ_POS3;
+                            drive.followTrajectoryAsync(MidJToPos3);
+                        } else {
+                            currentState = State.TRAJ_POS1;
+                            drive.followTrajectoryAsync(MidJtoPos11);
+                        }
                     }
                     break;
                 case TRAJ_POS2:
