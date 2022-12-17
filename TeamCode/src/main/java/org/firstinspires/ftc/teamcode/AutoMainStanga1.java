@@ -319,7 +319,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                     if(!drive.isBusy()){
                         sleep(100);
                         brateCleste("open");
-                        sleep(100);
+                        sleep(300);
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
                             coneOrder++;

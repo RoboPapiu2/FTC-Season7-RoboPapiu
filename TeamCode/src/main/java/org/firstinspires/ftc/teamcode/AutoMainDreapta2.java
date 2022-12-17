@@ -39,7 +39,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
     // unitate in metri
     double tagsize = 0.166;
 
-    // id la tag
+    /**id la tag**/
     int left = 11;
     int mid = 12;
     int right = 13;
@@ -138,7 +138,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
 
         Trajectory ConesToMidJ = drive.trajectoryBuilder(PushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 3.7, //todo: fine tune speed to go faster, prev 28
+                .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 4.1, //todo: fine tune speed to go faster, prev 28
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -148,7 +148,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones2 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0.1)
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0)
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -157,7 +157,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         Trajectory MidJToCones3 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0.1)
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0)
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);

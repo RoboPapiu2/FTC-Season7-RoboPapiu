@@ -104,13 +104,19 @@ public class TeleOPDrive extends LinearOpMode {
             drive.update();
 //            } else telemetry.addLine("you stepped on a junction idiot");
             if(gamepad2.dpad_up)
-                moveBrat("up");
+                moveBratSus("up");
 
             if(gamepad2.dpad_down)
-                moveBrat("down");
+                moveBratSus("low");
 
             if(gamepad2.y)
                 brateCleste();
+
+            if(gamepad2.dpad_right)
+                moveBratSus("middle");
+
+            if(gamepad2.dpad_left)
+                moveBratSus("down");
 
 
 
@@ -220,6 +226,29 @@ public class TeleOPDrive extends LinearOpMode {
         }
         robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.bratz.setPower(0.6);
+    }
+    public void moveBratSus(String direction){
+        if(Objects.equals(direction, "up")){
+                int ticks = (int)((16+18+24+4) * TICKS_PER_CM_Z);
+                robot.bratz.setTargetPosition(-ticks);
+                robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.bratz.setPower(1);
+        } else if(Objects.equals(direction, "down")){
+                int ticks = (int)((16+18+24+4) * TICKS_PER_CM_Z);
+                robot.bratz.setTargetPosition(0);
+                robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.bratz.setPower(1);
+        } else if(Objects.equals(direction, "middle")){
+            int ticks = (int)((18+24 * TICKS_PER_CM_Z));
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
+        } else if(Objects.equals(direction, "low")){
+            int ticks = (int)(24 * TICKS_PER_CM_Z);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(0.6);
+        }
     }
     boolean generatePoints(double x, double y){
         for(int i = 0; i < NUMPOINTS; ++i){
