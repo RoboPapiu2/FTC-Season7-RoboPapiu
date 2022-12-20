@@ -239,7 +239,7 @@ public class TeleOPDrive extends LinearOpMode {
                 robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "middle")){
-            int ticks = (int)((18+24 * TICKS_PER_CM_Z));
+            int ticks = (int)((18+24) * TICKS_PER_CM_Z);
             robot.bratz.setTargetPosition(-ticks);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.bratz.setPower(1);

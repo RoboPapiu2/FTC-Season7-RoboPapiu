@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 @TeleOp
-public class MiniMapButBetter extends LinearOpMode {
+public class minimap2 extends LinearOpMode {
     hardwarePapiu robot = new hardwarePapiu();
 
     //Global values.
@@ -53,6 +53,8 @@ public class MiniMapButBetter extends LinearOpMode {
         robot.EncoderReset();
 
         Pose2d StartPose = TransferPose.currentPose;
+        if(StartPose.getX() == 0 && StartPose.getY() ==0 && StartPose.getHeading() == Math.toRadians(0))
+            StartPose = new Pose2d(35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartPose);
 
 
