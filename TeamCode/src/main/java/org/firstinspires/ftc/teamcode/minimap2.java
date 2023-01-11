@@ -25,25 +25,35 @@ public class minimap2 extends LinearOpMode {
     boolean isMoving=false;
     boolean isOpen=true;
     double joystick_r_y, joystick_r_x, joystick_l_y, joystick_l_x;
-    double positionX, positionY, squareLength = 23.5, goToX, goToY, cx, cy, precision=3;
-    int liftCountZ=1;
+    double positionX, positionY;
+    double currentTime2 = 0;
+    boolean overrideInput2 = true;
+
+    Vector2d selectedMatPosition = new Vector2d();
 
     enum MODE {
         TELEOP,
         AUTO
     }
+    enum matEnum {
+        mat,
+        junction
+    }
+    matEnum currentModeMat = matEnum.mat;
     MODE currentMode = MODE.TELEOP;
 
     /** Selected junction position **/
     Vector2d targetPosition = new Vector2d(0, 0);
 
+
     // or HEADING_PID
     private PIDFController headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
+    // Read pose
+    Pose2d poseEstimate = new Pose2d();
 
     @Override
     public void runOpMode() throws InterruptedException{
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         drive.getLocalizer().setPoseEstimate(TransferPose.currentPose);
         headingController.setInputBounds(-Math.PI, Math.PI);
@@ -66,11 +76,9 @@ public class minimap2 extends LinearOpMode {
 
         waitForStart();
         while(!isStopRequested() && opModeIsActive()){
-            // Read pose
-            Pose2d poseEstimate = drive.getLocalizer().getPoseEstimate();
+            poseEstimate = drive.getLocalizer().getPoseEstimate();
             positionX = poseEstimate.getX();
             positionY = poseEstimate.getY();
-
 
             Pose2d driveDirection = new Pose2d();
 
@@ -93,31 +101,21 @@ public class minimap2 extends LinearOpMode {
                     // Switch to AUTO, even if second driver initiates a command
                     if(gamepad2.a)
                         currentMode = MODE.AUTO;
-                    if(gamepad1.a){
-                        setTargetJunction("BotRight");
-                        currentMode = MODE.AUTO;
-                    }
-                    if(gamepad1.b){
-                        setTargetJunction("TopRight");
-                        currentMode = MODE.AUTO;
-                    }
-                    if(gamepad1.x){
-                        setTargetJunction("BotLeft");
-                        currentMode = MODE.AUTO;
-                    }
-                    if(gamepad1.y){
-                        setTargetJunction("TopLeft");
-                        currentMode = MODE.AUTO;
 
-                    }
                     if(gamepad2.dpad_up)
-                        moveBrat("up");
+                        moveBratSus("up");
 
                     if(gamepad2.dpad_down)
-                        moveBrat("down");
+                        moveBratSus("low");
 
                     if(gamepad2.y)
                         brateCleste();
+
+                    if(gamepad2.dpad_right)
+                        moveBratSus("middle");
+
+                    if(gamepad2.dpad_left)
+                        moveBratSus("down");
 
                     // If trigger is pressed, give slower controls for extra precision
                     if(joystick_r_trigger>1) {
@@ -143,19 +141,19 @@ public class minimap2 extends LinearOpMode {
                         currentMode = MODE.TELEOP;
 
                     if(gamepad2.dpad_up)
-                        moveBrat("up");
+                        moveBratSus("up");
 
                     if(gamepad2.dpad_down)
-                        moveBrat("down");
+                        moveBratSus("low");
 
                     if(gamepad2.y)
                         brateCleste();
 
-                    //Junction commands
-                    if(gamepad1.y) setTargetJunction("TopLeft");
-                    if(gamepad1.b) setTargetJunction("TopRight");
-                    if(gamepad1.x) setTargetJunction("BotLeft");
-                    if(gamepad1.a) setTargetJunction("BotRight");
+                    if(gamepad2.dpad_right)
+                        moveBratSus("middle");
+
+                    if(gamepad2.dpad_left)
+                        moveBratSus("down");
 
                     Vector2d fieldFrameInput;
 
@@ -209,6 +207,34 @@ public class minimap2 extends LinearOpMode {
                     break;
             }
 
+            switch(currentModeMat){
+                case mat:
+                    if(gamepad1.start && overrideInput2) {
+                        currentTime2 = getRuntime();
+                        overrideInput2 = false;
+                        currentModeMat = matEnum.junction;
+                    }
+                    else {
+                        if(getRuntime() - currentTime2 > 0.2)
+                            overrideInput2 = true;
+                    }
+
+                    setTargetMat();
+                    break;
+                case junction:
+                    if(gamepad1.start && overrideInput2) {
+                        currentTime2 = getRuntime();
+                        overrideInput2 = false;
+                        currentModeMat = matEnum.mat;
+                    }
+                    else {
+                        if(getRuntime() - currentTime2 > 0.2)
+                            overrideInput2 = true;
+                    }
+                    setTargetJunction();
+                    break;
+            }
+
             // Draw bot on canvas
             fieldOverlay.setStroke("#3F51B5");
             DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
@@ -225,9 +251,8 @@ public class minimap2 extends LinearOpMode {
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
 
-            telemetry.addData("mode", currentMode);
-            telemetry.addData("lift level bratz: ", liftCountZ);
-            telemetry.update();
+//            telemetry.addData("mode", currentMode);
+//            telemetry.addData("lift level bratz: ", liftCountZ);
         }
     }
     /** Varibile pentru facut automatizare la teleop */
@@ -240,135 +265,105 @@ public class minimap2 extends LinearOpMode {
     //double TICKS_PER_CM_Z = GEAR_MOTOR_40_TICKS / (WHEEL_DIAMETER_CM * PI);
     double TICKS_PER_CM_Z = GEAR_MOTOR_GOBILDA5202_TICKS / (WHEEL_DIAMETER_CM * PI);
 
-    public void setTargetJunction(String junction){
-        goToX = 0; goToY = 0;
 
-        if(positionX < squareLength)
-            cx = squareLength / positionX;
-        else cx = positionX / squareLength;
+    public enum mat{
+        mat16(23.5, 2*23.5),
+        mat15(0, 2*23.5),
+        mat14(-23.5, 2*23.5),
+        mat13(-2*23.5, 2*23.5),
+        mat12(23.5, 23.5),
+        mat11(0, 23.5),
+        mat10(-23.5, 23.5),
+        mat8(23.5, -23.5),
+        mat9(-2*23.5, 23.5),
+        mat7(0, -23.5),
+        mat6(-23.5, -23.5),
+        mat5(-2*23.5, -23.5),
+        mat4(23.5, -2*23.5),
+        mat3(0, -2*23.5),
+        mat2(-23.5, -2*23.5),
+        mat1(-2*23.5, -2*23.5);
+        private final double y;
+        private final double x;
 
-        if(positionY < squareLength)
-            cy = squareLength / positionY;
-        else cy = positionY / squareLength;
-
-        if(junction == "TopLeft" || junction == "TopRight"){
-            if(positionY < 0) {
-                if (positionY > -squareLength)
-                    goToY = 0 + precision;
-                if (positionY < -squareLength)
-                    goToY = squareLength * (cy - 1) + precision;
-            }
-            else{
-                if (positionY < squareLength)
-                    goToY = squareLength + 3;
-                if (positionY > squareLength)
-                    goToY = squareLength * (cy + 1) + precision;
-            }
-            if(junction == "TopLeft"){
-                if(positionX < 0) {
-                    if (positionX > -squareLength)
-                        goToX = - squareLength + precision;
-                    if (positionX < -squareLength)
-                        goToX = squareLength * (cx - 1) + precision;
-                }
-                else{
-                    if(positionX < squareLength)
-                        goToX = 0 + precision;
-                    if(positionX > squareLength)
-                        goToX = cx * squareLength + precision;
-                }
-                targetPosition = new Vector2d(goToX, goToY);
-            }
-            else if(junction == "TopRight"){
-                if(positionX < 0) {
-                    if (positionX > -squareLength)
-                        goToX = 0 + precision;
-                    if (positionX < -squareLength)
-                        goToX = squareLength * cx + precision;
-                }
-                else{
-                    if(positionX < squareLength)
-                        goToX = squareLength + precision;
-                    if(positionX > squareLength)
-                        goToX = squareLength * (cx + 1) + precision;
-                }
-                targetPosition = new Vector2d(goToX, goToY);
-            }
-        } else if(junction == "BotLeft" || junction == "BotRight"){
-            if(positionY < 0) {
-                if (positionY > -squareLength)
-                    goToY = -squareLength + precision;
-                if (positionY < -squareLength)
-                    goToY = squareLength * (cy - 1) + precision;
-            }
-            else{
-                if (positionY < squareLength)
-                    goToY = squareLength + precision;
-                if (positionY > squareLength)
-                    goToY = squareLength * (cy + 1) + precision;
-            }
-            if(junction == "BotLeft"){
-                if(positionX < 0) {
-                    if (positionX > -squareLength)
-                        goToX = - squareLength + precision;
-                    if (positionX < -squareLength)
-                        goToX = squareLength * (cx - 1) + precision;
-                }
-                else{
-                    if(positionX < squareLength)
-                        goToX = 0 + precision;
-                    if(positionX > squareLength)
-                        goToX = cx * squareLength + precision;
-                }
-                targetPosition =  new Vector2d(goToX, goToY);
-            } else if(junction == "BotRight"){
-                if(positionX < 0) {
-                    if (positionX > -squareLength)
-                        goToX = 0 + precision;
-                    if (positionX < -squareLength)
-                        goToX = squareLength * cx + precision;
-                }
-                else{
-                    if(positionX < squareLength)
-                        goToX = squareLength + precision;
-                    if(positionX > squareLength)
-                        goToX = squareLength * (cx + 1) + precision;
-                }
-                targetPosition = new Vector2d(goToX, goToY);
-            }
-        }
-        targetPosition =  new Vector2d(goToX, goToY);
-    }
-
-    public void moveBrat(String direction){
-        if(Objects.equals(direction, "up")){
-            try {
-                // Limit movement so that it doesn't go above max height
-
-                if (liftCountZ < 4) {
-                    runToPosition(liftCountZ, "up");
-                }
-                else liftCountZ=4;
-
-                TimeUnit.MILLISECONDS.sleep(500);
-            } catch(InterruptedException e){
-                Thread.currentThread().interrupt();
-            }
-        } else if(Objects.equals(direction, "down")){
-            try {
-                // Limit movement so that it doesn't go below min height
-                if (liftCountZ > 1) {
-                    runToPosition(liftCountZ, "down");
-                }
-                else {
-                    liftCountZ=1;
-                }
-                TimeUnit.MILLISECONDS.sleep(500);
-            } catch (InterruptedException e){
-                Thread.currentThread().interrupt();
-            }
+        mat(double x, double y){
+            this.x = x;
+            this.y = y;
         }
     }
+
+    int indexOfMat=1, iSecond=0;
+    String message;
+    double currentTime = 0;
+    boolean overrideInput = true;
+    public void setTargetMat(){
+        if(overrideInput) {
+            currentTime = getRuntime();
+            if (gamepad1.dpad_right) {
+                indexOfMat++;
+                overrideInput=false;
+                if (indexOfMat > 16) indexOfMat = 16;
+            }
+            if (gamepad1.dpad_left) {
+                indexOfMat--;
+                overrideInput=false;
+                if (indexOfMat < 1) indexOfMat = 1;
+            }
+            if (gamepad1.dpad_down) {
+                indexOfMat -= 4;
+                overrideInput=false;
+                if (indexOfMat < 1) indexOfMat += 4;
+            }
+            if (gamepad1.dpad_up) {
+                indexOfMat += 4;
+                overrideInput=false;
+                if (indexOfMat > 16) indexOfMat -= 4;
+            }
+        } else {
+            if(getRuntime() - currentTime > 0.2)
+                overrideInput = true;
+        }
+        int i=0;
+        for(mat selectedMat : mat.values()){
+            i++;
+            if(i==indexOfMat){
+                selectedMatPosition = new Vector2d(selectedMat.x, selectedMat.y);
+                break;
+            }
+        }
+        iSecond=0;
+        message = "";
+        for(int m=1;m<=4;++m){
+            for(int j=1;j<=4;++j){
+                iSecond++;
+                if(iSecond==indexOfMat)
+                    message = message.concat(" + ");
+                else message = message.concat(" - ");
+            }
+            message = message.concat("\n");
+        }
+
+        telemetry.addLine(message);
+        telemetry.addData("Current mat: ", indexOfMat);
+        telemetry.update();
+    }
+
+    public void setTargetJunction(){
+        if(gamepad1.y) //top left
+            targetPosition = new Vector2d(selectedMatPosition.getX(), selectedMatPosition.getY() + 23.5);
+        else if(gamepad1.b) // top right
+            targetPosition = new Vector2d(selectedMatPosition.getX()+23.5, selectedMatPosition.getY() + 23.5);
+        else if(gamepad1.x) // bot left
+            targetPosition = new Vector2d(selectedMatPosition.getX(), selectedMatPosition.getY());
+        else if(gamepad1.a) // bot right
+            targetPosition = new Vector2d(selectedMatPosition.getX()+23.5, selectedMatPosition.getY());
+
+        telemetry.addLine("Y - Top left \n B - Top right \n X - Bot left \n A - Bot right \n");
+        telemetry.addData("Current position selected: ", targetPosition);
+        telemetry.addData("Current mat selected:\n", message);
+        telemetry.update();
+    }
+
     public void brateCleste() {
         try {
             isOpen=!isOpen;
@@ -385,43 +380,26 @@ public class minimap2 extends LinearOpMode {
             Thread.currentThread().interrupt();
         }
     }
-    public void runToPosition(int level, String rotation) {
-        int ticks;
-        if(rotation == "up"){
-            liftCountZ++;
-            level = liftCountZ;
-            switch(level){
-                case 2:
-                    ticks = (int)(24 * TICKS_PER_CM_Z);
-                    robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - ticks);
-                    break;
-                case 3:
-                    ticks = (int)(18 * TICKS_PER_CM_Z);
-                    robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - ticks);
-                    break;
-                case 4:
-                    ticks = (int)(16 * TICKS_PER_CM_Z);
-                    robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - ticks);
-                    break;
-            }
-        } else if(rotation == "down"){
-            liftCountZ--;
-            level = liftCountZ;
-            switch(level){
-                case 1:
-                    robot.bratz.setTargetPosition(0);
-                    break;
-                case 2:
-                    ticks = (int)(18 * TICKS_PER_CM_Z);
-                    robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + ticks);
-                    break;
-                case 3:
-                    ticks = (int)(16 * TICKS_PER_CM_Z);
-                    robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + ticks);
-                    break;
-            }
+    public void moveBratSus(String direction){
+        if(Objects.equals(direction, "up")){
+            int ticks = (int)((16+18+24+4) * TICKS_PER_CM_Z);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
+        } else if(Objects.equals(direction, "down")){
+            robot.bratz.setTargetPosition(0);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
+        } else if(Objects.equals(direction, "middle")){
+            int ticks = (int)((18+24) * TICKS_PER_CM_Z);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
+        } else if(Objects.equals(direction, "low")){
+            int ticks = (int)(24 * TICKS_PER_CM_Z);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(0.6);
         }
-        robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.bratz.setPower(0.6);
     }
 }
