@@ -61,9 +61,9 @@ public class DriveConstants {
 //    public static double kStatic = 0.07524;
 
     //        current values
-    public static double kV = 0.022;
-    public static double kA = 0.0031;
-    public static double kStatic = 0.02;
+    public static double kV = 0.0203;
+    public static double kA = 0.002;
+    public static double kStatic = 0.05337;
 
     //         default values
 //    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
@@ -84,10 +84,10 @@ public class DriveConstants {
 //    public static double MAX_ANG_VEL = Math.toRadians(60);
 //    public static double MAX_ANG_ACCEL = Math.toRadians(60);
 
-    //          old values
-    public static double MAX_VEL = 39;
+    //          current values
+    public static double MAX_VEL = 44;
     public static double MAX_ACCEL = 30;
-    public static double MAX_ANG_VEL = Math.toRadians(210); //old encoders: 220
+    public static double MAX_ANG_VEL = Math.toRadians(208.749375); //old encoders: 220
     public static double MAX_ANG_ACCEL = Math.toRadians(60);
 
 

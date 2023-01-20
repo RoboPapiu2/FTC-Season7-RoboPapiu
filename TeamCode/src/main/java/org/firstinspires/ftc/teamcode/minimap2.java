@@ -10,12 +10,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.vuforia.Device;
+
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+@Config
 @TeleOp
 public class minimap2 extends LinearOpMode {
     hardwarePapiu robot = new hardwarePapiu();
@@ -31,16 +36,22 @@ public class minimap2 extends LinearOpMode {
 
     Vector2d selectedMatPosition = new Vector2d();
 
+    enum MODEPARENT {
+        minimap,
+        glisiera
+    }
+
     enum MODE {
-        TELEOP,
-        AUTO
+        minimap,
+        minimapSelect
     }
     enum matEnum {
         mat,
         junction
     }
     matEnum currentModeMat = matEnum.mat;
-    MODE currentMode = MODE.TELEOP;
+    MODE currentMode = MODE.minimap;
+    MODEPARENT currentModeParent = MODEPARENT.glisiera;
 
     /** Selected junction position **/
     Vector2d targetPosition = new Vector2d(0, 0);
@@ -64,7 +75,7 @@ public class minimap2 extends LinearOpMode {
 
         Pose2d StartPose = TransferPose.currentPose;
         if(StartPose.getX() == 0 && StartPose.getY() ==0 && StartPose.getHeading() == Math.toRadians(0))
-            StartPose = new Pose2d(35.5, -61, Math.toRadians(90));
+            StartPose = new Pose2d(-35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartPose);
 
 
@@ -95,149 +106,198 @@ public class minimap2 extends LinearOpMode {
             isMoving= joystick_l_x != 0 && joystick_r_y != 0 && joystick_l_y != 0 && joystick_r_x != 0;
             /** Base Movement**/
 
-            switch (currentMode) {
-                case TELEOP:
+            switch (currentModeParent){
+                case minimap:
+                    switch (currentMode) {
+                        case minimap:
 
-                    // Switch to AUTO, even if second driver initiates a command
-                    if(gamepad2.a)
-                        currentMode = MODE.AUTO;
+                            // Switch to AUTO, even if second driver initiates a command
+                            if(gamepad2.a)
+                                currentMode = MODE.minimapSelect;
 
-                    if(gamepad2.dpad_up)
-                        moveBratSus("up");
+                            if(gamepad2.dpad_up)
+                                moveBratSus("up");
 
-                    if(gamepad2.dpad_down)
-                        moveBratSus("low");
+                            if(gamepad2.dpad_down)
+                                moveBratSus("low");
 
-                    if(gamepad2.y)
-                        brateCleste();
+                            if(gamepad2.y)
+                                brateCleste();
 
-                    if(gamepad2.dpad_right)
-                        moveBratSus("middle");
+                            if(gamepad2.dpad_right)
+                                moveBratSus("middle");
 
-                    if(gamepad2.dpad_left)
-                        moveBratSus("down");
+                            if(gamepad2.dpad_left)
+                                moveBratSus("down");
 
-                    // If trigger is pressed, give slower controls for extra precision
-                    if(joystick_r_trigger>1) {
-                        driveDirection = new Pose2d(
-                                -joystick_l_y/(1.5*joystick_r_trigger),
-                                -joystick_l_x/(1.5*joystick_r_trigger),
-                                -joystick_r_x/(5*joystick_r_trigger)
-                        );
+                            // If trigger is pressed, give slower controls for extra precision
+                            if(joystick_r_trigger>1) {
+                                driveDirection = new Pose2d(
+                                        -joystick_l_y/(1.5*joystick_r_trigger),
+                                        -joystick_l_x/(1.5*joystick_r_trigger),
+                                        -joystick_r_x/(5*joystick_r_trigger)
+                                );
+                            }
+                            else {
+                                driveDirection = new Pose2d(
+                                        -joystick_l_y/1.2,
+                                        -joystick_l_x/1.2,
+                                        -joystick_r_x/1.2
+                                );
+                            }
+
+                            break;
+                        case minimapSelect:
+
+                            // Switch back to TELEOP
+                            if(gamepad2.b)
+                                currentMode = MODE.minimap;
+
+                            if(gamepad2.dpad_up)
+                                moveBratSus("up");
+
+                            if(gamepad2.dpad_down)
+                                moveBratSus("low");
+
+                            if(gamepad2.y)
+                                brateCleste();
+
+                            if(gamepad2.dpad_right)
+                                moveBratSus("middle");
+
+                            if(gamepad2.dpad_left)
+                                moveBratSus("down");
+
+                            Vector2d fieldFrameInput;
+
+                            if(joystick_r_trigger>1) {
+                                fieldFrameInput = new Vector2d(
+                                        -joystick_l_x/(1.5*joystick_r_trigger),
+                                        -joystick_l_y/(1.5*joystick_r_trigger)
+                                );
+                            }
+                            else{
+                                fieldFrameInput = new Vector2d(
+                                        -joystick_l_x/1.2,
+                                        -joystick_l_y/1.2
+                                );
+                            }
+                            Vector2d robotFrameInput = fieldFrameInput.rotated(-poseEstimate.getHeading());
+
+                            // Difference between the target vector and the bot's position
+                            Vector2d difference = targetPosition.minus(poseEstimate.vec());
+                            // Obtain the target angle for feedback and derivative for feedforward
+                            double theta = difference.angle();
+
+                            // Not technically omega because its power. This is the derivative of atan2
+                            double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+                            // Set the target heading for the heading controller to our desired angle
+                            headingController.setTargetPosition(theta);
+
+                            // Set desired angular velocity to the heading controller output + angular
+                            // velocity feedforward
+                            double headingInput = (headingController.update(poseEstimate.getHeading())
+                                    * DriveConstants.kV + thetaFF)
+                                    * DriveConstants.TRACK_WIDTH
+                                    * (Math.abs(joystick_r_x-1));
+
+                            // Combine the field centric x/y velocity with our derived angular velocity
+                            driveDirection = new Pose2d(
+                                    robotFrameInput,
+                                    headingInput
+                            );
+
+                            // Draw lines to target
+                            fieldOverlay.setStroke("#b89eff");
+                            fieldOverlay.strokeLine(targetPosition.getX(), targetPosition.getY(), poseEstimate.getX(), poseEstimate.getY());
+                            fieldOverlay.setStroke("#ffce7a");
+                            fieldOverlay.strokeLine(targetPosition.getX(), targetPosition.getY(), targetPosition.getX(), poseEstimate.getY());
+                            fieldOverlay.strokeLine(targetPosition.getX(), poseEstimate.getY(), poseEstimate.getX(), poseEstimate.getY());
+                            break;
                     }
-                    else {
-                        driveDirection = new Pose2d(
-                                -joystick_l_y/1.2,
-                                -joystick_l_x/1.2,
-                                -joystick_r_x/1.2
-                        );
+                    switch(currentModeMat){
+                        case mat:
+                            if(gamepad1.start && overrideInput2) {
+                                currentTime2 = getRuntime();
+                                overrideInput2 = false;
+                                currentModeMat = matEnum.junction;
+                            }
+                            else {
+                                if(getRuntime() - currentTime2 > 0.2)
+                                    overrideInput2 = true;
+                            }
+
+                            setTargetMat();
+                            break;
+                        case junction:
+                            if(gamepad1.start && overrideInput2) {
+                                currentTime2 = getRuntime();
+                                overrideInput2 = false;
+                                currentModeMat = matEnum.mat;
+                            }
+                            else {
+                                if(getRuntime() - currentTime2 > 0.2)
+                                    overrideInput2 = true;
+                            }
+                            setTargetJunction();
+                            break;
                     }
-
-                    break;
-                case AUTO:
-
-                    // Switch back to TELEOP
-                    if(gamepad2.b)
-                        currentMode = MODE.TELEOP;
-
-                    if(gamepad2.dpad_up)
-                        moveBratSus("up");
-
-                    if(gamepad2.dpad_down)
-                        moveBratSus("low");
-
-                    if(gamepad2.y)
-                        brateCleste();
-
-                    if(gamepad2.dpad_right)
-                        moveBratSus("middle");
-
-                    if(gamepad2.dpad_left)
-                        moveBratSus("down");
-
-                    Vector2d fieldFrameInput;
-
-                    if(joystick_r_trigger>1) {
-                        fieldFrameInput = new Vector2d(
-                                -joystick_l_y/(1.5*joystick_r_trigger),
-                                -joystick_l_x/(1.5*joystick_r_trigger)
-                        );
-                    }
-                    else{
-                        fieldFrameInput = new Vector2d(
-                                -joystick_l_y/1.2,
-                                -joystick_l_x/1.2
-                        );
-                    }
-                    Vector2d robotFrameInput = fieldFrameInput.rotated(-poseEstimate.getHeading());
-
-                    // Difference between the target vector and the bot's position
-                    Vector2d difference = targetPosition.minus(poseEstimate.vec());
-                    // Obtain the target angle for feedback and derivative for feedforward
-                    double theta = difference.angle();
-
-                    // Not technically omega because its power. This is the derivative of atan2
-                    double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
-
-                    // Set the target heading for the heading controller to our desired angle
-                    headingController.setTargetPosition(theta);
-
-                    // Set desired angular velocity to the heading controller output + angular
-                    // velocity feedforward
-                    double headingInput = (headingController.update(poseEstimate.getHeading())
-                            * DriveConstants.kV + thetaFF)
-                            * DriveConstants.TRACK_WIDTH;
-
-                    // Combine the field centric x/y velocity with our derived angular velocity
-                    driveDirection = new Pose2d(
-                            robotFrameInput,
-                            headingInput
-                    );
-
-                    // Draw the target on the field
-                    fieldOverlay.setStroke("#dd2c00");
-                    fieldOverlay.strokeCircle(targetPosition.getX(), targetPosition.getY(), DRAWING_TARGET_RADIUS);
-
-                    // Draw lines to target
-                    fieldOverlay.setStroke("#b89eff");
-                    fieldOverlay.strokeLine(targetPosition.getX(), targetPosition.getY(), poseEstimate.getX(), poseEstimate.getY());
-                    fieldOverlay.setStroke("#ffce7a");
-                    fieldOverlay.strokeLine(targetPosition.getX(), targetPosition.getY(), targetPosition.getX(), poseEstimate.getY());
-                    fieldOverlay.strokeLine(targetPosition.getX(), poseEstimate.getY(), poseEstimate.getX(), poseEstimate.getY());
-                    break;
-            }
-
-            switch(currentModeMat){
-                case mat:
-                    if(gamepad1.start && overrideInput2) {
+                    if(gamepad1.back && overrideInput2) {
                         currentTime2 = getRuntime();
                         overrideInput2 = false;
-                        currentModeMat = matEnum.junction;
+                        currentModeParent = MODEPARENT.glisiera;
                     }
                     else {
                         if(getRuntime() - currentTime2 > 0.2)
                             overrideInput2 = true;
                     }
-
-                    setTargetMat();
                     break;
-                case junction:
-                    if(gamepad1.start && overrideInput2) {
+                case glisiera:
+                    if(gamepad1.dpad_up)
+                        moveBratSus("up");
+
+                    if(gamepad1.dpad_down)
+                        moveBratSus("low");
+
+                    if(gamepad1.dpad_right)
+                        moveBratSus("middle");
+
+                    if(gamepad1.dpad_left)
+                        moveBratSus("down");
+
+                    if(gamepad1.left_stick_y>0  && robot.bratz.getCurrentPosition()<-10){
+                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + 20);
+                        robot.bratz.setPower(1);
+                    } else if(gamepad1.left_stick_y<0){
+                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - 20);
+                        robot.bratz.setPower(1);
+                    }
+
+                    telemetry.addLine("Selected mode: GLISIERA\nPress back for minimap");
+                    telemetry.addData("brat ticks: ", robot.bratz.getCurrentPosition());
+                    telemetry.update();
+
+
+                    if(gamepad1.back && overrideInput2) {
                         currentTime2 = getRuntime();
                         overrideInput2 = false;
-                        currentModeMat = matEnum.mat;
+                        currentModeParent = MODEPARENT.minimap;
                     }
                     else {
                         if(getRuntime() - currentTime2 > 0.2)
                             overrideInput2 = true;
                     }
-                    setTargetJunction();
                     break;
             }
 
             // Draw bot on canvas
             fieldOverlay.setStroke("#3F51B5");
             DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
+
+            // Draw the target on the field
+            fieldOverlay.setStroke("#dd2c00");
+            fieldOverlay.strokeCircle(targetPosition.getX(), targetPosition.getY(), DRAWING_TARGET_RADIUS);
 
             drive.setWeightedDrivePower(driveDirection);
 
@@ -267,22 +327,25 @@ public class minimap2 extends LinearOpMode {
 
 
     public enum mat{
-        mat16(23.5, 2*23.5),
-        mat15(0, 2*23.5),
-        mat14(-23.5, 2*23.5),
         mat13(-2*23.5, 2*23.5),
-        mat12(23.5, 23.5),
-        mat11(0, 23.5),
-        mat10(-23.5, 23.5),
-        mat8(23.5, -23.5),
+        mat14(-23.5, 2*23.5),
+        mat15(0, 2*23.5),
+        mat16(23.5, 2*23.5),
+
         mat9(-2*23.5, 23.5),
-        mat7(0, -23.5),
-        mat6(-23.5, -23.5),
+        mat10(-23.5, 23.5),
+        mat11(0, 23.5),
+        mat12(23.5, 23.5),
+
         mat5(-2*23.5, -23.5),
-        mat4(23.5, -2*23.5),
-        mat3(0, -2*23.5),
+        mat6(-23.5, -23.5),
+        mat7(0, -23.5),
+        mat8(23.5, -23.5),
+
+        mat1(-2*23.5, -2*23.5),
         mat2(-23.5, -2*23.5),
-        mat1(-2*23.5, -2*23.5);
+        mat3(0, -2*23.5),
+        mat4(23.5, -2*23.5);
         private final double y;
         private final double x;
 
@@ -292,7 +355,7 @@ public class minimap2 extends LinearOpMode {
         }
     }
 
-    int indexOfMat=1, iSecond=0;
+    int indexOfMat=13, iSecond=0;
     String message;
     double currentTime = 0;
     boolean overrideInput = true;
@@ -309,12 +372,12 @@ public class minimap2 extends LinearOpMode {
                 overrideInput=false;
                 if (indexOfMat < 1) indexOfMat = 1;
             }
-            if (gamepad1.dpad_down) {
+            if (gamepad1.dpad_up) {
                 indexOfMat -= 4;
                 overrideInput=false;
                 if (indexOfMat < 1) indexOfMat += 4;
             }
-            if (gamepad1.dpad_up) {
+            if (gamepad1.dpad_down) {
                 indexOfMat += 4;
                 overrideInput=false;
                 if (indexOfMat > 16) indexOfMat -= 4;
@@ -337,12 +400,13 @@ public class minimap2 extends LinearOpMode {
             for(int j=1;j<=4;++j){
                 iSecond++;
                 if(iSecond==indexOfMat)
-                    message = message.concat(" + ");
-                else message = message.concat(" - ");
+                    message = message.concat("  +  ");
+                else message = message.concat("  -  ");
             }
             message = message.concat("\n");
         }
 
+        telemetry.addLine("Selected mode: MINIMAP\nPress back for glisiera");
         telemetry.addLine(message);
         telemetry.addData("Current mat: ", indexOfMat);
         telemetry.update();
@@ -358,9 +422,10 @@ public class minimap2 extends LinearOpMode {
         else if(gamepad1.a) // bot right
             targetPosition = new Vector2d(selectedMatPosition.getX()+23.5, selectedMatPosition.getY());
 
+        telemetry.addLine("Selected mode: MINIMAP\nPress back for glisiera");
         telemetry.addLine("Y - Top left \n B - Top right \n X - Bot left \n A - Bot right \n");
+        telemetry.addData("Current mat selected\n", message);
         telemetry.addData("Current position selected: ", targetPosition);
-        telemetry.addData("Current mat selected:\n", message);
         telemetry.update();
     }
 

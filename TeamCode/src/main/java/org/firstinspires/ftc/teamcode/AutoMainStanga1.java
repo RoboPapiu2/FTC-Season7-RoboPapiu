@@ -104,7 +104,7 @@ public class AutoMainStanga1 extends LinearOpMode {
         Trajectory StartToLow = drive.trajectoryBuilder(StartBottom) //TODO: sugiuc
                 .lineToLinearHeading(new Pose2d(-28, -52, Math.toRadians(45)),
                         // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(26, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .addDisplacementMarker(0,()->{
                     runToPosition(2, "up");
@@ -125,7 +125,10 @@ public class AutoMainStanga1 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2)
+                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2,
+                        // Limit speed of trajectory
+                        SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);

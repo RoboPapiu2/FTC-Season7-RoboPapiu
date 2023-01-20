@@ -55,10 +55,10 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(5, 0, 1); //TODO: sugiuc //5,0,1
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 1); //TODO: sugiuc //5,0,1
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(10, 0, 0); //9,0,0
 
-    public static double LATERAL_MULTIPLIER = 1.281474357; // old encoders: 1.084148823
+    public static double LATERAL_MULTIPLIER = 1.198510901; // old encoders: 1.084148823
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -315,7 +315,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public Double getExternalHeadingVelocity() {
-        return (double) imu.getAngularVelocity().zRotationRate; // prev y
+        return (double) imu.getAngularVelocity().yRotationRate; // prev z
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
