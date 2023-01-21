@@ -102,7 +102,7 @@ public class AutoMainStanga1 extends LinearOpMode {
 
         /** Build trajectories **/
         Trajectory StartToLow = drive.trajectoryBuilder(StartBottom) //TODO: sugiuc
-                .lineToLinearHeading(new Pose2d(-28, -52, Math.toRadians(45)),
+                .lineToLinearHeading(new Pose2d(-27, -51, Math.toRadians(45)),
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -125,7 +125,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2,
+                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3, //3.2 prev
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -166,7 +166,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                 .build();
 
         Trajectory MidJtoPos11 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(-48, -10, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-48, -15, Math.toRadians(180)))
                 .addDisplacementMarker(() -> drive.followTrajectoryAsync(MidJToPos12))
                 .build();
 
@@ -177,13 +177,13 @@ public class AutoMainStanga1 extends LinearOpMode {
                 })
                 .build();
         Trajectory MidJToPos2 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })
                 .build();
         Trajectory MidJToPos3 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(-10, -10, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-10, -13, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })

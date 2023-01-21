@@ -28,7 +28,7 @@ public class minimap2 extends LinearOpMode {
     //Global values.
     public static double DRAWING_TARGET_RADIUS = 2;
     boolean isMoving=false;
-    boolean isOpen=true;
+    boolean isOpen=false;
     double joystick_r_y, joystick_r_x, joystick_l_y, joystick_l_x;
     double positionX, positionY;
     double currentTime2 = 0;
@@ -82,8 +82,8 @@ public class minimap2 extends LinearOpMode {
         /** Default motor values / Reset encoders **/
         robot.bratz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.bratz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.servoLeft.setPosition(0);
-        robot.servoRight.setPosition(0.4);
+        robot.servoLeft.setPosition(0.07);
+        robot.servoRight.setPosition(0.32);
 
         waitForStart();
         while(!isStopRequested() && opModeIsActive()){
@@ -254,6 +254,45 @@ public class minimap2 extends LinearOpMode {
                     }
                     break;
                 case glisiera:
+
+                    if(gamepad2.dpad_up)
+                        moveBratSus("up");
+
+                    if(gamepad2.dpad_down)
+                        moveBratSus("low");
+
+                    if(gamepad2.y)
+                        brateCleste();
+
+                    if(gamepad2.dpad_right)
+                        moveBratSus("middle");
+
+                    if(gamepad2.dpad_left)
+                        moveBratSus("down");
+
+                    // If trigger is pressed, give slower controls for extra precision
+                    if(joystick_r_trigger>1) {
+                        driveDirection = new Pose2d(
+                                -joystick_l_y/(1.5*joystick_r_trigger),
+                                -joystick_l_x/(1.5*joystick_r_trigger),
+                                -joystick_r_x/(5*joystick_r_trigger)
+                        );
+                    }
+                    else if(gamepad2.right_bumper){
+                        driveDirection = new Pose2d(
+                                -joystick_l_y,
+                                -joystick_l_x,
+                                -joystick_r_x
+                        );
+                    }
+                    else {
+                        driveDirection = new Pose2d(
+                                -joystick_l_y/1.2,
+                                -joystick_l_x/1.2,
+                                -joystick_r_x/1.2
+                        );
+                    }
+
                     if(gamepad1.dpad_up)
                         moveBratSus("up");
 
@@ -437,8 +476,8 @@ public class minimap2 extends LinearOpMode {
                 robot.servoRight.setPosition(0.4);
             }
             else{ //pt inchis
-                robot.servoLeft.setPosition(0.07);
-                robot.servoRight.setPosition(0.32);
+                robot.servoLeft.setPosition(0.08);
+                robot.servoRight.setPosition(0.3);
             }
             TimeUnit.MILLISECONDS.sleep(300);
         } catch (InterruptedException e){
@@ -447,7 +486,7 @@ public class minimap2 extends LinearOpMode {
     }
     public void moveBratSus(String direction){
         if(Objects.equals(direction, "up")){
-            int ticks = (int)((16+18+24+4) * TICKS_PER_CM_Z);
+            int ticks = (int)((16+18+24+2) * TICKS_PER_CM_Z); //+4 prev
             robot.bratz.setTargetPosition(-ticks);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.bratz.setPower(1);
