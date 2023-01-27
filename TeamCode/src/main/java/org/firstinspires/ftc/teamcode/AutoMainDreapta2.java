@@ -96,13 +96,13 @@ public class AutoMainDreapta2 extends LinearOpMode {
         Pose2d StartBottom = new Pose2d(35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartBottom);
         //pt inchis cleste
-        robot.servoLeft.setPosition(0.07);
-        robot.servoRight.setPosition(0.32);
+        robot.servoLeft.setPosition(0.12);
+        robot.servoRight.setPosition(0.3);
 
 
         /** Build trajectories **/
         Trajectory StartToLow = drive.trajectoryBuilder(StartBottom) //TODO: sugiuc
-                .lineToLinearHeading(new Pose2d(28, -52, Math.toRadians(135)),
+                .lineToLinearHeading(new Pose2d(27, -52, Math.toRadians(135)),
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(26, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -138,7 +138,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
 
         Trajectory ConesToMidJ = drive.trajectoryBuilder(PushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(27.5, -17.5, Math.toRadians(225)), 4.1, //todo: fine tune speed to go faster, prev 28
+                .splineToSplineHeading(new Pose2d(26.5, -19.5, Math.toRadians(225)), 4.1, //todo: fine tune speed to go faster, prev 28
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -171,7 +171,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         MidJToPos12 = drive.trajectoryBuilder(MidJtoPos11.end())
-                .lineToLinearHeading(new Pose2d(57, -10, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(57, -13, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
@@ -189,7 +189,6 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 })
                 .build();
 
-        //init loooooooooooooooooooooooooooooooooop
 
         while (!isStarted() && !isStopRequested())
         {
@@ -502,8 +501,8 @@ public class AutoMainDreapta2 extends LinearOpMode {
             robot.servoRight.setPosition(0.4);
         }
         else if(state == "closed"){ //pt inchis
-            robot.servoLeft.setPosition(0.07);
-            robot.servoRight.setPosition(0.32);
+            robot.servoLeft.setPosition(0.12);
+            robot.servoRight.setPosition(0.3);
         }
     }
 }

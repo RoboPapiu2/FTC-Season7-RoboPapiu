@@ -133,7 +133,7 @@ public class Minimap extends LinearOpMode{
                     if(gamepad2.dpad_left)
                         moveBratSus("down");
 
-                    if (gamepad1.y) {                 /**up**/
+                    if (gamepad1.y) {                 /**up left**/
                         if (positionY < 0) {
                             if (positionY > -squareLength)
                                 goToY = 0 + precision;
@@ -145,76 +145,100 @@ public class Minimap extends LinearOpMode{
                             if (positionY > squareLength)
                                 goToY = squareLength * (cy + 1) + precision;
                         }
-                        if (gamepad1.x) {             /**left**/
-                            if (positionX < 0) {
-                                if (positionX > -squareLength)
-                                    goToX = -squareLength + precision;
-                                if (positionX < -squareLength)
-                                    goToX = squareLength * (cx - 1) + precision;
-                            } else {
-                                if (positionX < squareLength)
-                                    goToX = 0 + precision;
-                                if (positionX > squareLength)
-                                    goToX = cx * squareLength + precision;
+                        if (positionX < 0) {
+                            if (positionX > -squareLength)
+                                goToX = -squareLength + precision;
+                            if (positionX < -squareLength)
+                                goToX = squareLength * (cx - 1) + precision;
                             }
-                            unghi = 135;
+                        else {
+                            if (positionX < squareLength)
+                                goToX = 0 + precision;
+                            if (positionX > squareLength)
+                                goToX = cx * squareLength + precision;
                         }
-                        if (gamepad1.b) {             /**right**/
-                            if (positionX < 0) {
-                                if (positionX > -squareLength)
-                                    goToX = 0 + precision;
-                                if (positionX < -squareLength)
-                                    goToX = squareLength * cx + precision;
-                            } else {
-                                if (positionX < squareLength)
-                                    goToX = squareLength + precision;
-                                if (positionX > squareLength)
-                                    goToX = squareLength * (cx + 1) + precision;
-                            }
-                            unghi = 45;
+                        unghi = 135;
+                    }
+                    if (gamepad1.b) {       /**up right**/
+                        if (positionY < 0) {
+                            if (positionY > -squareLength)
+                                goToY = 0 + precision;
+                            if (positionY < -squareLength)
+                                goToY = squareLength * (cy - 1) + precision;
+                        } else {
+                            if (positionY < squareLength)
+                                goToY = squareLength + 3;
+                            if (positionY > squareLength)
+                                goToY = squareLength * (cy + 1) + precision;
                         }
+                        if (positionX < 0) {
+                            if (positionX > -squareLength)
+                                goToX = 0 + precision;
+                            if (positionX < -squareLength)
+                                goToX = squareLength * cx + precision;
+                        } else {
+                            if (positionX < squareLength)
+                                goToX = squareLength + precision;
+                            if (positionX > squareLength)
+                                goToX = squareLength * (cx + 1) + precision;
+                        }
+                        unghi = 45;
                     }
 
-                    if (gamepad1.a) {                 /**down**/
+
+                    if (gamepad1.a) {                 /**down right**/
                         if (positionY < 0) {
                             if (positionY > -squareLength)
                                 goToY = -squareLength + precision;
                             if (positionY < -squareLength)
                                 goToY = squareLength * (cy - 1) + precision;
-                        } else {
+                        }
+                        else {
                             if (positionY < squareLength)
                                 goToY = squareLength + precision;
                             if (positionY > squareLength)
                                 goToY = squareLength * cy + precision;
                         }
-                        if (gamepad1.x) {             /**left**/
-                            if (positionX < 0) {
-                                if (positionX > -squareLength)
-                                    goToX = -squareLength + precision;
-                                if (positionX < -squareLength)
-                                    goToX = squareLength * (cx - 1) + precision;
-                            } else {
-                                if (positionX < squareLength)
-                                    goToX = 0 + precision;
-                                if (positionX > squareLength)
-                                    goToX = cx * squareLength + precision;
-                            }
-                            unghi = -135;
+                        if (positionX < 0) {
+                            if (positionX > -squareLength)
+                                goToX = -squareLength + precision;
+                            if (positionX < -squareLength)
+                                goToX = squareLength * (cx - 1) + precision;
                         }
-                        if (gamepad1.b) {             /**right**/
-                            if (positionX < 0) {
-                                if (positionX > -squareLength)
-                                    goToX = 0 + precision;
-                                if (positionX < -squareLength)
-                                    goToX = squareLength * cx + precision;
-                            } else {
-                                if (positionX < squareLength)
-                                    goToX = squareLength + precision;
-                                if (positionX > squareLength)
-                                    goToX = squareLength * (cx + 1) + precision;
-                            }
-                            unghi = -45;
+                        else {
+                            if (positionX < squareLength)
+                                goToX = 0 + precision;
+                            if (positionX > squareLength)
+                                goToX = cx * squareLength + precision;
                         }
+                        unghi = -45;
+                    }
+                    if (gamepad1.x) {             /**down left**/
+                        if (positionY < 0) {
+                            if (positionY > -squareLength)
+                                goToY = -squareLength + precision;
+                            if (positionY < -squareLength)
+                                goToY = squareLength * (cy - 1) + precision;
+                        }
+                        else {
+                            if (positionY < squareLength)
+                                goToY = squareLength + precision;
+                            if (positionY > squareLength)
+                                goToY = squareLength * cy + precision;
+                        }
+                        if (positionX < 0) {
+                            if (positionX > -squareLength)
+                                goToX = 0 + precision;
+                            if (positionX < -squareLength)
+                                goToX = squareLength * cx + precision;
+                        }
+                        else {
+                            if (positionX < squareLength)
+                                goToX = squareLength + precision;
+                            if (positionX > squareLength)
+                                goToX = squareLength * (cx + 1) + precision;
+                        }
+                        unghi = -135;
                     }
 
                     telemetry.addData("goToX = ", goToX);
@@ -247,7 +271,7 @@ public class Minimap extends LinearOpMode{
 
                 case Auto:
 
-                    if(gamepad2.b)
+                    if(gamepad2.b)          //TODO: se poate tot gamepad2.a? ar fi mai usor sa schimbi currentmode ul de pe acelasi buton
                         currentMode = mode.Teleop;
 
 
@@ -264,6 +288,7 @@ public class Minimap extends LinearOpMode{
                                     if (goToY == -2 * squareLength + precision || goToY == precision || goToY == 2 * squareLength + precision)
                                         moveBratSus("down"); //TODO: aici primul if trebuie sa cuprinda urmatoarele doua if-uri sau nu?
                                                                         // daca da, pune {}
+                                                                        //nu trebuie, is cazuri separate
                                 if (goToX == -2 * squareLength + precision && (goToY == -squareLength + precision || goToY == squareLength + precision) || goToX == -squareLength + precision && (goToY == -2 * squareLength + precision || goToY == 2 * squareLength + precision) ||
                                         goToX == squareLength + precision && (goToY == -2 * squareLength + precision || goToY == 2 * squareLength + precision) || goToX == 2 * squareLength + precision && (goToY == -squareLength + precision || goToY == squareLength + precision))
                                     moveBratSus("low");
@@ -288,12 +313,14 @@ public class Minimap extends LinearOpMode{
 
                         case GoToJunction:
                             if(drive.isBusy()) {
-                                drive.breakFollowing();
+                                if(gamepad2.a)              //TODO: choose your button carefully :)
+                                    drive.breakFollowing();
                                 drive.followTrajectoryAsync(GoToJunction);
                             }
                             else if(!drive.isBusy()){
                                 drive.followTrajectoryAsync(GoToJunction);
                             }
+                            break;
                     }
                     break;
             }

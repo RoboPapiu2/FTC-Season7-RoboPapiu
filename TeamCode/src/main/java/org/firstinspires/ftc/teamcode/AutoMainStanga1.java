@@ -97,8 +97,8 @@ public class AutoMainStanga1 extends LinearOpMode {
         Pose2d StartBottom = new Pose2d(-35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartBottom);
         //pt inchis cleste
-        robot.servoLeft.setPosition(0.07);
-        robot.servoRight.setPosition(0.32);
+        robot.servoLeft.setPosition(0.12);
+        robot.servoRight.setPosition(0.3);
 
         /** Build trajectories **/
         Trajectory StartToLow = drive.trajectoryBuilder(StartBottom) //TODO: sugiuc
@@ -295,6 +295,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                         brateCleste("open");
                         if(!robot.digitalTouch.getState()){ //if button is pressed against the wall
                             drive.breakFollowing();
+                            drive.setDrivePower(new Pose2d());
                             /**  5th cone  */
                             brateCleste("closed");
                             sleep(300);
@@ -338,6 +339,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                     if(drive.isBusy()){
                         if(!robot.digitalTouch.getState()){
                             drive.breakFollowing();
+                            drive.setDrivePower(new Pose2d());
                             /**  5th cone  */
                             brateCleste("closed");
                             sleep(300);
@@ -365,6 +367,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                     if(drive.isBusy()){
                         if(!robot.digitalTouch.getState()){
                             drive.breakFollowing();
+                            drive.setDrivePower(new Pose2d());
                             /**  5th cone  */
                             brateCleste("closed");
                             sleep(300);
@@ -502,8 +505,8 @@ public class AutoMainStanga1 extends LinearOpMode {
             robot.servoRight.setPosition(0.4);
         }
         else if(state == "closed"){ //pt inchis
-            robot.servoLeft.setPosition(0.07);
-            robot.servoRight.setPosition(0.32);
+            robot.servoLeft.setPosition(0.12);
+            robot.servoRight.setPosition(0.3);
         }
     }
 }
