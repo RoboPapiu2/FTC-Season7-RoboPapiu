@@ -79,11 +79,14 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity testBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(39, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
+                .setConstraints(44, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(35.5, -61, Math.toRadians(90)))
-                                        .lineToLinearHeading(new Pose2d(28, -52, Math.toRadians(135))) //drop cone 1
-                                        .build()
+                        drive.trajectorySequenceBuilder(new Pose2d(-35.5, -8, Math.toRadians(90)))
+                                .setReversed(true)
+                                .setTangent(24)
+                                .splineToSplineHeading(new Pose2d(-48, -10, Math.toRadians(180)), Math.toRadians(180))
+                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), Math.toRadians(180))
+                                .build()
                 );
         RoadRunnerBotEntity testBot2 = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
@@ -97,8 +100,9 @@ public class MeepMeepTesting {
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(botStanga)
-                .addEntity(botDreapta)
+                //.addEntity(botStanga)
+                //.addEntity(botDreapta)
+                .addEntity(testBot)
                 .start();
     }
 }

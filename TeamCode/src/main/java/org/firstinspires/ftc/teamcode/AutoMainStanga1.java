@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -63,6 +64,7 @@ public class AutoMainStanga1 extends LinearOpMode {
     Trajectory MidJToPos12;
     Trajectory PushCone2;
     Trajectory PushCone3;
+    TrajectorySequence testPushCone3;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -122,13 +124,25 @@ public class AutoMainStanga1 extends LinearOpMode {
                     brateCleste("open");
                     runToPosition(1, "down");
                 })
-                .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
+//                .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
+                .addDisplacementMarker(()->drive.followTrajectorySequenceAsync(testPushCone3))
                 .build();
         PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
                 .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3, //3.2 prev
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .addDisplacementMarker(1, ()->{
+                    // grab 5th cone
+                    int ticks = (int)(8 * TICKS_PER_CM_Z);
+                    robot.bratz.setTargetPosition(-ticks);
+                })
+                .build();
+        testPushCone3 = drive.trajectorySequenceBuilder(PushCone2.end())
+                .setReversed(true)
+                .setTangent(24)
+                .splineToSplineHeading(new Pose2d(-48, -10, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), Math.toRadians(180))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -171,7 +185,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                 .build();
 
         MidJToPos12 = drive.trajectoryBuilder(MidJtoPos11.end())
-                .lineToLinearHeading(new Pose2d(-57, -10, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-59, -13, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
@@ -285,7 +299,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                 case TRAJ_1:
                     if(!drive.isBusy()){
                         brateCleste("open");
-                        sleep(200);
+                        sleep(400);
                         currentState = State.TRAJ_2;
                         drive.followTrajectoryAsync(PushCone1); //prev LowToCones
                     }
@@ -348,6 +362,18 @@ public class AutoMainStanga1 extends LinearOpMode {
                                 //do nothing
                             }
                             currentState = State.TRAJ_3REPEAT;
+
+//                            Trajectory testThingTraj = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+//                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5,
+//                                        // Limit speed of trajectory
+//                                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+//                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+//                                .addDisplacementMarker(2,()->{
+//                                    runToPosition(3,"up");
+//                                })
+//                                .build();
+//                        drive.followTrajectoryAsync(testThingTraj);
+
                             drive.followTrajectoryAsync(ConesToMidJ);
                         }
                     }
@@ -360,6 +386,18 @@ public class AutoMainStanga1 extends LinearOpMode {
                             //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
+
+//                        Trajectory testThingTraj = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+//                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5,
+//                                        // Limit speed of trajectory
+//                                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+//                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+//                                .addDisplacementMarker(2,()->{
+//                                    runToPosition(3,"up");
+//                                })
+//                                .build();
+//                        drive.followTrajectoryAsync(testThingTraj);
+
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
                     break;
