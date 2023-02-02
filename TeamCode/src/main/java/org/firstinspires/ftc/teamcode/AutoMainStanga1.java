@@ -152,10 +152,11 @@ public class AutoMainStanga1 extends LinearOpMode {
 
 
         Trajectory ConesToMidJ = drive.trajectoryBuilder(PushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5,
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5
+//                        // Limit speed of trajectory
+//                        ,SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+//                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                )
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
@@ -179,30 +180,29 @@ public class AutoMainStanga1 extends LinearOpMode {
                 })
                 .build();
 
-        Trajectory MidJtoPos11 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(-48, -15, Math.toRadians(180)))
-                .addDisplacementMarker(() -> drive.followTrajectoryAsync(MidJToPos12))
-                .build();
-
-        MidJToPos12 = drive.trajectoryBuilder(MidJtoPos11.end())
+        /*` parking positions */
+        TrajectorySequence MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                .lineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(315)))
                 .lineToLinearHeading(new Pose2d(-59, -13, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
                 .build();
-        Trajectory MidJToPos2 = drive.trajectoryBuilder(MidJToCones3.end())
+
+        TrajectorySequence MidJToPos2 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
                 .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })
                 .build();
-        Trajectory MidJToPos3 = drive.trajectoryBuilder(MidJToCones3.end())
+
+        TrajectorySequence MidJToPos3Sequence = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(315)))
                 .lineToLinearHeading(new Pose2d(-10, -13, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })
                 .build();
-        //init loooooooooooooooooooooooooooooooooop
 
         while (!isStarted() && !isStopRequested())
         {
@@ -340,14 +340,30 @@ public class AutoMainStanga1 extends LinearOpMode {
                         sleep(300);
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
-                            coneOrder++;
+                            coneOrder=2;
                             drive.followTrajectoryAsync(MidJToCones2);
                         } else if(coneOrder==2){
-                            currentState = State.TRAJ4_2;
-                            coneOrder++;
+                            currentState = State.TRAJ4_1;
+                            coneOrder=3;
                             drive.followTrajectoryAsync(MidJToCones3);
+                        } else if(coneOrder==3){
+                            switch (POSITION) {
+                                case "left":
+                                    currentState = State.TRAJ_POS1;
+                                    drive.followTrajectorySequenceAsync(MidJtoPos1);
+                                    break;
+                                case "right":
+                                    currentState = State.TRAJ_POS3;
+                                    drive.followTrajectorySequenceAsync(MidJToPos3Sequence);
+                                    break;
+                                case "mid":
+                                default:
+                                    currentState = State.TRAJ_POS2;
+                                    drive.followTrajectorySequenceAsync(MidJToPos2);
+                                    break;
                             }
                         }
+                    }
                     break;
                 case TRAJ4_1:
                     if(drive.isBusy()){
@@ -359,20 +375,10 @@ public class AutoMainStanga1 extends LinearOpMode {
                             sleep(300);
                             runToPosition(2, "up");
                             while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                //do nothing
+                                telemetry.addLine("IN WHILE 1");
+                                telemetry.update();
                             }
                             currentState = State.TRAJ_3REPEAT;
-
-//                            Trajectory testThingTraj = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-//                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5,
-//                                        // Limit speed of trajectory
-//                                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-//                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-//                                .addDisplacementMarker(2,()->{
-//                                    runToPosition(3,"up");
-//                                })
-//                                .build();
-//                        drive.followTrajectoryAsync(testThingTraj);
 
                             drive.followTrajectoryAsync(ConesToMidJ);
                         }
@@ -383,20 +389,10 @@ public class AutoMainStanga1 extends LinearOpMode {
                         sleep(300);
                         runToPosition(2, "up");
                         while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            //do nothing
+                            telemetry.addLine("IN WHILE 1");
+                            telemetry.update();
                         }
                         currentState = State.TRAJ_3REPEAT;
-
-//                        Trajectory testThingTraj = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-//                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5,
-//                                        // Limit speed of trajectory
-//                                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-//                                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-//                                .addDisplacementMarker(2,()->{
-//                                    runToPosition(3,"up");
-//                                })
-//                                .build();
-//                        drive.followTrajectoryAsync(testThingTraj);
 
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
@@ -410,24 +406,13 @@ public class AutoMainStanga1 extends LinearOpMode {
                             brateCleste("closed");
                             sleep(300);
                             runToPosition(2, "up");
-                            while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                //do nothing
+                            while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
+                                telemetry.addLine("IN WHILE 2");
+                                telemetry.update();
                             }
-                            coneOrder++;
-                            if(POSITION =="left"){
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            } else if(POSITION == "mid"){
-                                currentState = State.TRAJ_POS2;
-                                drive.followTrajectoryAsync(MidJToPos2);
-                            }
-                            else if(POSITION == "right"){
-                                currentState = State.TRAJ_POS3;
-                                drive.followTrajectoryAsync(MidJToPos3);
-                            } else {
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            }
+                            coneOrder=3;
+                            currentState = State.TRAJ_3REPEAT;
+                            drive.followTrajectory(ConesToMidJ);
                         }
                     }
                     if(!drive.isBusy()){
@@ -435,24 +420,13 @@ public class AutoMainStanga1 extends LinearOpMode {
                         brateCleste("closed");
                         sleep(300);
                         runToPosition(2, "up");
-                        while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            //do nothing
+                        while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
+                            telemetry.addLine("IN WHILE 2");
+                            telemetry.update();
                         }
-                            coneOrder++;
-                            if(POSITION =="left"){
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            } else if(POSITION == "mid"){
-                                currentState = State.TRAJ_POS2;
-                                drive.followTrajectoryAsync(MidJToPos2);
-                            }
-                            else if(POSITION == "right"){
-                                currentState = State.TRAJ_POS3;
-                                drive.followTrajectoryAsync(MidJToPos3);
-                            } else {
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            }
+                        coneOrder=3;
+                        currentState = State.TRAJ_3REPEAT;
+                        drive.followTrajectory(ConesToMidJ);
                     }
                     break;
                 case TRAJ_POS2:
@@ -535,7 +509,7 @@ public class AutoMainStanga1 extends LinearOpMode {
             }
         }
         robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.bratz.setPower(0.6);
+        robot.bratz.setPower(0.8);
     }
     public void brateCleste(String state) {
         if(state == "open"){ //pt deschis

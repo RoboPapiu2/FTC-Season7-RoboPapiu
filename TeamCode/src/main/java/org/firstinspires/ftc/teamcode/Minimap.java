@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.acmerobotics.dashboard.FtcDashboard;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.configs.VariableConfig;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Encoder;
 import org.json.JSONException;
@@ -60,6 +61,8 @@ public class Minimap extends LinearOpMode{
         robot.EncoderReset();
         drive.setPoseEstimate(new Pose2d(-35.5, -61, Math.toRadians(90)));
 
+
+
         waitForStart();
 
         while(!isStopRequested()) {
@@ -73,6 +76,8 @@ public class Minimap extends LinearOpMode{
 
             positionX = drive.getPoseEstimate().getX();
             positionY = drive.getPoseEstimate().getY();   //-Aici pt coordonate
+
+            currentTraj = traj.GoToMid;
 
             telemetry.addData("positionX = ", positionX);
             telemetry.addData("positionY = ", positionY);
@@ -118,6 +123,25 @@ public class Minimap extends LinearOpMode{
             switch (currentMode) {
 
                 case Teleop:
+                    if (joystic_r_trigger > 1) {
+                        drive.setWeightedDrivePower(
+                                new Pose2d(
+                                        -joystick_l_y / (1.5 * joystic_r_trigger),
+                                        -joystick_l_x / (1.5 * joystic_r_trigger),
+                                        -joystick_r_x / (5 * joystic_r_trigger)
+                                )
+                        );
+                    } else {
+                        drive.setWeightedDrivePower(
+                                new Pose2d(
+                                        -joystick_l_y / 1.2,
+                                        -joystick_l_x / 1.2,
+                                        -joystick_r_x / 1.2
+                                )
+                        );
+                    }
+                    drive.update();
+
                     if(gamepad2.dpad_up)
                         moveBratSus("up");
 
@@ -158,6 +182,8 @@ public class Minimap extends LinearOpMode{
                                 goToX = cx * squareLength + precision;
                         }
                         unghi = 135;
+                        currentMode = mode.Auto;
+                        telemetry.addData("junction Y->", currentMode);
                     }
                     if (gamepad1.b) {       /**up right**/
                         if (positionY < 0) {
@@ -183,6 +209,7 @@ public class Minimap extends LinearOpMode{
                                 goToX = squareLength * (cx + 1) + precision;
                         }
                         unghi = 45;
+                        currentMode = mode.Auto;
                     }
 
 
@@ -212,6 +239,7 @@ public class Minimap extends LinearOpMode{
                                 goToX = cx * squareLength + precision;
                         }
                         unghi = -45;
+                        currentMode = mode.Auto;
                     }
                     if (gamepad1.x) {             /**down left**/
                         if (positionY < 0) {
@@ -239,42 +267,33 @@ public class Minimap extends LinearOpMode{
                                 goToX = squareLength * (cx + 1) + precision;
                         }
                         unghi = -135;
+                        currentMode = mode.Auto;
                     }
-
+                    telemetry.addLine("SUNT IN TELEOP");
                     telemetry.addData("goToX = ", goToX);
                     telemetry.addData("goToY = ", goToY);
                     telemetry.addData("selected junction : ", selectedJ);
                     telemetry.update();
 
-                    if(gamepad2.a)
+                    if(gamepad2.a) {
                         currentMode = mode.Auto;
-
-                    if (joystic_r_trigger > 1) {
-                        drive.setWeightedDrivePower(
-                                new Pose2d(
-                                        -joystick_l_y / (1.5 * joystic_r_trigger),
-                                        -joystick_l_x / (1.5 * joystic_r_trigger),
-                                        -joystick_r_x / (5 * joystic_r_trigger)
-                                )
-                        );
-                    } else {
-                        drive.setWeightedDrivePower(
-                                new Pose2d(
-                                        -joystick_l_y / 1.2,
-                                        -joystick_l_x / 1.2,
-                                        -joystick_r_x / 1.2
-                                )
-                        );
+                        telemetry.addData("Auto->", currentMode);
+                        telemetry.addLine("TREC IN AUTO");
+                        telemetry.update();
                     }
-                    drive.update();
+
+
                     break;
 
                 case Auto:
 
-                    if(gamepad2.b)          //TODO: se poate tot gamepad2.a? ar fi mai usor sa schimbi currentmode ul de pe acelasi buton
+                    if(gamepad2.b) {         //TODO: se poate tot gamepad2.a? ar fi mai usor sa schimbi currentmode ul de pe acelasi buton
                         currentMode = mode.Teleop;
+                        telemetry.addLine("TREC IN TELEOP");
+                        telemetry.update();
+                    }
 
-
+                    telemetry.addLine("SUNT IN AUTO");
                     Trajectory GoToMid = drive.trajectoryBuilder(new Pose2d(drive.getPoseEstimate().getX(), drive.getPoseEstimate().getY(),
                                     drive.getPoseEstimate().getHeading()))
                             .lineToLinearHeading(new Pose2d(midX, midY, Math.toRadians(0)))
@@ -305,9 +324,12 @@ public class Minimap extends LinearOpMode{
                     switch (currentTraj)
                     {
                         case GoToMid:
-                            if(!drive.isBusy()) {
+                            if(!drive.isBusy()) {           //TODO: check driveisbusy
                                 currentTraj = traj.GoToJunction;
                                 drive.followTrajectoryAsync(GoToMid);
+                                telemetry.addData("currentTraj", currentTraj);
+                                telemetry.addLine("AM FOST IN MID");
+                                telemetry.update();
                             }
                             break;
 
@@ -316,9 +338,13 @@ public class Minimap extends LinearOpMode{
                                 if(gamepad2.a)              //TODO: choose your button carefully :)
                                     drive.breakFollowing();
                                 drive.followTrajectoryAsync(GoToJunction);
+                                telemetry.addData("currentTraj", currentTraj);
+
                             }
                             else if(!drive.isBusy()){
                                 drive.followTrajectoryAsync(GoToJunction);
+                                telemetry.addLine("AM FOST LA JUNCTION");
+                                telemetry.update();
                             }
                             break;
                     }
@@ -330,7 +356,7 @@ public class Minimap extends LinearOpMode{
 //                if (positionY < 0) {
 //                    if (positionY > -squareLength)
 //                        goToY = 0 + precision;
-//                    if (positionY < -squareLength)
+//                    if (positionY < -squareLength)q
 //                        goToY = squareLength * (cy - 1) + precision;
 //                } else {
 //                    if (positionY < squareLength)

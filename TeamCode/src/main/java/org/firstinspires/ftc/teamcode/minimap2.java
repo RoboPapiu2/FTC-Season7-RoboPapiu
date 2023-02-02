@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.acmerobotics.dashboard.config.Config;
 import com.vuforia.Device;
 
+import org.firstinspires.ftc.teamcode.configs.VariableConfig;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 @TeleOp
 public class minimap2 extends LinearOpMode {
     hardwarePapiu robot = new hardwarePapiu();
+    VariableConfig config = new VariableConfig();
 
     //Global values.
     public static double DRAWING_TARGET_RADIUS = 2;
@@ -71,6 +73,7 @@ public class minimap2 extends LinearOpMode {
 
 
         robot.init(hardwareMap);
+        config.init(hardwareMap);
         robot.EncoderReset();
 
         Pose2d StartPose = TransferPose.currentPose;
@@ -95,7 +98,6 @@ public class minimap2 extends LinearOpMode {
 
             TelemetryPacket packet = new TelemetryPacket();
             Canvas fieldOverlay = packet.fieldOverlay();
-
             /** variables **/
 
             joystick_l_y = gamepad2.left_stick_y;
@@ -116,19 +118,19 @@ public class minimap2 extends LinearOpMode {
                                 currentMode = MODE.minimapSelect;
 
                             if(gamepad2.dpad_up)
-                                moveBratSus("up");
+                                config.moveBratSus("up");
 
                             if(gamepad2.dpad_down)
-                                moveBratSus("low");
+                                config.moveBratSus("low");
 
                             if(gamepad2.y)
-                                brateCleste();
+                                config.brateCleste();
 
                             if(gamepad2.dpad_right)
-                                moveBratSus("middle");
+                                config.moveBratSus("middle");
 
                             if(gamepad2.dpad_left)
-                                moveBratSus("down");
+                                config.moveBratSus("down");
 
                             // If trigger is pressed, give slower controls for extra precision
                             if(joystick_r_trigger>1) {
@@ -154,19 +156,19 @@ public class minimap2 extends LinearOpMode {
                                 currentMode = MODE.minimap;
 
                             if(gamepad2.dpad_up)
-                                moveBratSus("up");
+                                config.moveBratSus("up");
 
                             if(gamepad2.dpad_down)
-                                moveBratSus("low");
+                                config.moveBratSus("low");
 
                             if(gamepad2.y)
-                                brateCleste();
+                                config.brateCleste();
 
                             if(gamepad2.dpad_right)
-                                moveBratSus("middle");
+                                config.moveBratSus("middle");
 
                             if(gamepad2.dpad_left)
-                                moveBratSus("down");
+                                config.moveBratSus("down");
 
                             Vector2d fieldFrameInput;
 
@@ -183,26 +185,20 @@ public class minimap2 extends LinearOpMode {
                                 );
                             }
                             Vector2d robotFrameInput = fieldFrameInput.rotated(-poseEstimate.getHeading());
-
-                            // Difference between the target vector and the bot's position
+                            // Target vector - current position
                             Vector2d difference = targetPosition.minus(poseEstimate.vec());
-                            // Obtain the target angle for feedback and derivative for feedforward
+                            // Angle and Derivative
                             double theta = difference.angle();
-
-                            // Not technically omega because its power. This is the derivative of atan2
+                            // Derivative atan2
                             double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
-
                             // Set the target heading for the heading controller to our desired angle
                             headingController.setTargetPosition(theta);
-
-                            // Set desired angular velocity to the heading controller output + angular
                             // velocity feedforward
                             double headingInput = (headingController.update(poseEstimate.getHeading())
                                     * DriveConstants.kV + thetaFF)
                                     * DriveConstants.TRACK_WIDTH
                                     * (Math.abs(joystick_r_x-1));
-
-                            // Combine the field centric x/y velocity with our derived angular velocity
+                            // Refactor pose
                             driveDirection = new Pose2d(
                                     robotFrameInput,
                                     headingInput
@@ -256,19 +252,19 @@ public class minimap2 extends LinearOpMode {
                 case glisiera:
 
                     if(gamepad2.dpad_up)
-                        moveBratSus("up");
+                        config.moveBratSus("up");
 
                     if(gamepad2.dpad_down)
-                        moveBratSus("low");
+                        config.moveBratSus("low");
 
                     if(gamepad2.y)
-                        brateCleste();
+                        config.brateCleste();
 
                     if(gamepad2.dpad_right)
-                        moveBratSus("middle");
+                        config.moveBratSus("middle");
 
                     if(gamepad2.dpad_left)
-                        moveBratSus("down");
+                        config.moveBratSus("down");
 
                     // If trigger is pressed, give slower controls for extra precision
                     if(joystick_r_trigger>1) {
@@ -294,22 +290,22 @@ public class minimap2 extends LinearOpMode {
                     }
 
                     if(gamepad1.dpad_up)
-                        moveBratSus("up");
+                        config.moveBratSus("up");
 
                     if(gamepad1.dpad_down)
-                        moveBratSus("low");
+                        config.moveBratSus("low");
 
                     if(gamepad1.dpad_right)
-                        moveBratSus("middle");
+                        config.moveBratSus("middle");
 
                     if(gamepad1.dpad_left)
-                        moveBratSus("down");
+                        config.moveBratSus("down");
 
                     if(gamepad1.left_stick_y>0  && robot.bratz.getCurrentPosition()<-10){
-                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + 20);
+                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + 40);
                         robot.bratz.setPower(1);
                     } else if(gamepad1.left_stick_y<0){
-                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - 20);
+                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - 40);
                         robot.bratz.setPower(1);
                     }
 
@@ -354,16 +350,6 @@ public class minimap2 extends LinearOpMode {
 //            telemetry.addData("lift level bratz: ", liftCountZ);
         }
     }
-    /** Varibile pentru facut automatizare la teleop */
-
-    double PI = 3.1415;
-    double GEAR_MOTOR_40_TICKS = 1120;
-    double GEAR_MOTOR_ORBITAL20_TICKS = 537.6;
-    double GEAR_MOTOR_GOBILDA5202_TICKS = 537.7;
-    double WHEEL_DIAMETER_CM = 4;
-    //double TICKS_PER_CM_Z = GEAR_MOTOR_40_TICKS / (WHEEL_DIAMETER_CM * PI);
-    double TICKS_PER_CM_Z = GEAR_MOTOR_GOBILDA5202_TICKS / (WHEEL_DIAMETER_CM * PI);
-
 
     public enum mat{
         mat13(-2*23.5, 2*23.5),
@@ -466,44 +452,5 @@ public class minimap2 extends LinearOpMode {
         telemetry.addData("Current mat selected\n", message);
         telemetry.addData("Current position selected: ", targetPosition);
         telemetry.update();
-    }
-
-    public void brateCleste() {
-        try {
-            isOpen=!isOpen;
-            if(isOpen){ //pt deschis
-                robot.servoLeft.setPosition(0);
-                robot.servoRight.setPosition(0.4);
-            }
-            else{ //pt inchis
-                robot.servoLeft.setPosition(0.12);
-                robot.servoRight.setPosition(0.3);
-            }
-            TimeUnit.MILLISECONDS.sleep(300);
-        } catch (InterruptedException e){
-            Thread.currentThread().interrupt();
-        }
-    }
-    public void moveBratSus(String direction){
-        if(Objects.equals(direction, "up")){
-            int ticks = (int)((16+18+24+2) * TICKS_PER_CM_Z); //+4 prev
-            robot.bratz.setTargetPosition(-ticks);
-            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.bratz.setPower(1);
-        } else if(Objects.equals(direction, "down")){
-            robot.bratz.setTargetPosition(0);
-            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.bratz.setPower(1);
-        } else if(Objects.equals(direction, "middle")){
-            int ticks = (int)((18+24) * TICKS_PER_CM_Z);
-            robot.bratz.setTargetPosition(-ticks);
-            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.bratz.setPower(1);
-        } else if(Objects.equals(direction, "low")){
-            int ticks = (int)(24 * TICKS_PER_CM_Z);
-            robot.bratz.setTargetPosition(-ticks);
-            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.bratz.setPower(0.6);
-        }
     }
 }

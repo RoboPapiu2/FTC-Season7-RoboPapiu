@@ -32,14 +32,14 @@ public class MeepMeepTesting {
 
                                 .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
                                 .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) // traj4_1
-                                .waitSeconds(1.5)
+//                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) // traj4_1
+//                                .waitSeconds(1.5)
 
                                 .setReversed(false)
 
                                 //zone 1
-                                .lineToLinearHeading(new Pose2d(-48, -10, Math.toRadians(180)))
-                                .lineToLinearHeading(new Pose2d(-57, -10, Math.toRadians(270)))
+                                .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(315)))
+                                .lineToLinearHeading(new Pose2d(-59, -13, Math.toRadians(270)))
 
                                 .build()
                 );
@@ -100,9 +100,9 @@ public class MeepMeepTesting {
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                //.addEntity(botStanga)
+                .addEntity(botStanga)
                 //.addEntity(botDreapta)
-                .addEntity(testBot)
+                //.addEntity(testBot)
                 .start();
     }
 }
