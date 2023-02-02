@@ -20,29 +20,10 @@ import java.util.concurrent.TimeUnit;
 public class VariableConfig{
     //TODO: INVOKING ON NULL OBJECT REFERENCE, NEED INIT BUT CANT. solutie where
 
-    HardwareMap hwMap = null;
     hardwarePapiu robot = new hardwarePapiu();
 
-
-    public DcMotor bratz = null;
-    public Servo servoRight, servoLeft;
-    public DigitalChannel digitalTouch;
     public void init(HardwareMap ahwmap){
         robot.init(ahwmap);
-        hwMap=ahwmap;
-
-        /* Motoare Baza */
-
-        bratz = hwMap.get(DcMotor.class, "motorZ");
-        bratz.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        servoLeft = hwMap.get(Servo.class, "servoLeft");
-        servoRight = hwMap.get(Servo.class, "servoRight");
-        servoLeft.setDirection(Servo.Direction.REVERSE);
-        servoRight.setDirection(Servo.Direction.REVERSE);
-
-        digitalTouch = hwMap.get(DigitalChannel.class, "touchSensor");
-        digitalTouch.setMode(DigitalChannel.Mode.INPUT);
     }
 
     public VariableConfig(){}
@@ -60,12 +41,12 @@ public class VariableConfig{
         try {
             isOpen=!isOpen;
             if(isOpen){ //pt deschis
-                servoLeft.setPosition(cleste.cOpen1);
-                servoRight.setPosition(cleste.cOpen2);
+                robot.servoLeft.setPosition(cleste.cOpen1);
+                robot.servoRight.setPosition(cleste.cOpen2);
             }
             else{ //pt inchis
-                servoLeft.setPosition(cleste.cClosed1);
-                servoRight.setPosition(cleste.cClosed2);
+                robot.servoLeft.setPosition(cleste.cClosed1);
+                robot.servoRight.setPosition(cleste.cClosed2);
             }
             TimeUnit.MILLISECONDS.sleep(300);
         } catch (InterruptedException e){
@@ -75,23 +56,23 @@ public class VariableConfig{
     public void moveBratSus(String direction){
         if(Objects.equals(direction, "up")){
             int ticks = (int)(slide.up * VariableStorage.TICKS_PER_CM_Z); //
-            bratz.setTargetPosition(-ticks);
-            bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            bratz.setPower(1);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "down")){
-            bratz.setTargetPosition((int)(slide.down * VariableStorage.TICKS_PER_CM_Z));
-            bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            bratz.setPower(1);
+            robot.bratz.setTargetPosition((int)(slide.down * VariableStorage.TICKS_PER_CM_Z));
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "middle")){
             int ticks = (int)(slide.middle * VariableStorage.TICKS_PER_CM_Z);
-            bratz.setTargetPosition(-ticks);
-            bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            bratz.setPower(1);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "low")){
             int ticks = (int)(slide.low * VariableStorage.TICKS_PER_CM_Z);
-            bratz.setTargetPosition(-ticks);
-            bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            bratz.setPower(0.6);
+            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.bratz.setPower(0.6);
         }
     }
 }
