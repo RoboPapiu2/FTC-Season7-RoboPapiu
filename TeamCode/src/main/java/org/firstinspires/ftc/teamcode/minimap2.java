@@ -259,6 +259,7 @@ public class minimap2 extends LinearOpMode {
 
                     if(gamepad2.y)
                         config.brateCleste();
+                    // Code continues
 
                     if(gamepad2.dpad_right)
                         config.moveBratSus("middle");
