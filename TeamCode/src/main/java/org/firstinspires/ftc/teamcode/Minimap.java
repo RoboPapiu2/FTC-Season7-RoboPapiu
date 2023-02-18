@@ -325,7 +325,6 @@ public class Minimap extends LinearOpMode{
                     if (gamepad2.a) {         //TODO: se poate tot gamepad2.a? ar fi mai usor sa schimbi currentmode ul de pe acelasi buton
                         currentMode = mode.Teleop;
                         telemetry.addLine("TREC IN TELEOP");
-                        telemetry.update();
                     }
 
                     while (currentTraj != traj.Done && !isStopRequested()) {
@@ -345,17 +344,22 @@ public class Minimap extends LinearOpMode{
 
                             case GoToJunction:
                                 telemetry.addLine("TRAJ JUNCTION");
-                                if (gamepad2.x) {              //TODO: choose your button carefully :)
-                                    drive.breakFollowing();
-                                    drive.setDrivePower(new Pose2d());
-                                    currentMode = mode.Teleop;
-                                }
+                                telemetry.update();
                                 //drive.followTrajectory(GoToJunction);
-                                else if(!drive.isBusy()) {
+                                if(!drive.isBusy()) {
                                     drive.followTrajectoryAsync(GoToJunction);
+                                    telemetry.addLine("PRIMUL IF llllllllllllllllllllllllllll");
+                                    telemetry.update();
+                                    if (gamepad2.x) {              //TODO: choose your button carefully :)
+                                        drive.breakFollowing();
+                                        drive.setDrivePower(new Pose2d());
+                                        currentMode = mode.Teleop;
+                                        telemetry.addLine("BRAKE FOLLOWING");
+                                        telemetry.update();
+                                    }
                                     currentTraj = traj.Done;
                                     telemetry.addLine("AM FOST LA JUNCTION");
-                                    //telemetry.update();
+                                    telemetry.update();
                                 }
                                 telemetry.addData("currentTraj ", currentTraj);
                                 break;

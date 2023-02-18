@@ -66,6 +66,8 @@ public class AutoMainStanga1 extends LinearOpMode {
     Trajectory PushCone3;
     TrajectorySequence testPushCone3;
 
+    double conePos = -11;
+
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);
@@ -127,22 +129,14 @@ public class AutoMainStanga1 extends LinearOpMode {
 //                .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .addDisplacementMarker(()->drive.followTrajectorySequenceAsync(testPushCone3))
                 .build();
-        PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3, //3.2 prev
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .addDisplacementMarker(1, ()->{
-                    // grab 5th cone
-                    int ticks = (int)(8 * TICKS_PER_CM_Z);
-                    robot.bratz.setTargetPosition(-ticks);
-                })
-                .build();
         testPushCone3 = drive.trajectorySequenceBuilder(PushCone2.end())
                 .setReversed(true)
                 .setTangent(24)
-                .splineToSplineHeading(new Pose2d(-48, -10, Math.toRadians(180)), Math.toRadians(180))
-                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-48, conePos, Math.toRadians(180)), Math.toRadians(180),
+                        // Limit speed of trajectory
+                        SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .splineToSplineHeading(new Pose2d(-64.5, conePos, Math.toRadians(180)), Math.toRadians(180))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -151,8 +145,8 @@ public class AutoMainStanga1 extends LinearOpMode {
                 .build();
 
 
-        Trajectory ConesToMidJ = drive.trajectoryBuilder(PushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5
+        Trajectory ConesToMidJ = drive.trajectoryBuilder(testPushCone3.end(), true)
+                .splineToSplineHeading(new Pose2d(-27.5, -17.2, Math.toRadians(315)), 5.5
 //                        // Limit speed of trajectory
 //                        ,SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
 //                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
@@ -162,8 +156,10 @@ public class AutoMainStanga1 extends LinearOpMode {
                 })
                 .build();
 
-        Trajectory MidJToCones2 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2)
+        TrajectorySequence MidJToCones2 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(180)), 3.2)
+                .splineToSplineHeading(new Pose2d(-64.5, -11, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -171,8 +167,10 @@ public class AutoMainStanga1 extends LinearOpMode {
                 })
                 .build();
 
-        Trajectory MidJToCones3 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2)
+        TrajectorySequence MidJToCones3 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(180)), 3.2)
+                .splineToSplineHeading(new Pose2d(-64.5, -11, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -183,7 +181,7 @@ public class AutoMainStanga1 extends LinearOpMode {
         /*` parking positions */
         TrajectorySequence MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
                 .lineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(315)))
-                .lineToLinearHeading(new Pose2d(-59, -13, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-58, -11, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
@@ -341,11 +339,11 @@ public class AutoMainStanga1 extends LinearOpMode {
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
                             coneOrder=2;
-                            drive.followTrajectoryAsync(MidJToCones2);
+                            drive.followTrajectorySequenceAsync(MidJToCones2);
                         } else if(coneOrder==2){
                             currentState = State.TRAJ4_1;
                             coneOrder=3;
-                            drive.followTrajectoryAsync(MidJToCones3);
+                            drive.followTrajectorySequenceAsync(MidJToCones3);
                         } else if(coneOrder==3){
                             switch (POSITION) {
                                 case "left":
@@ -517,8 +515,8 @@ public class AutoMainStanga1 extends LinearOpMode {
             robot.servoRight.setPosition(0.4);
         }
         else if(state == "closed"){ //pt inchis
-            robot.servoLeft.setPosition(0.12);
-            robot.servoRight.setPosition(0.3);
+            robot.servoLeft.setPosition(0.17);
+            robot.servoRight.setPosition(0.35);
         }
     }
 }

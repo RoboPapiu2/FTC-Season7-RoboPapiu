@@ -15,23 +15,17 @@ public class MeepMeepTesting {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(39, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-35.5, -61, Math.toRadians(90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-64.5, -11, Math.toRadians(180)))
 
-                                .lineToLinearHeading(new Pose2d(-28, -52, Math.toRadians(45))) //drop cone 1
-
-                                .lineToLinearHeading(new Pose2d(-35.5, -55, Math.toRadians(60))) //pushcone 1
-                                .lineToLinearHeading(new Pose2d(-35.5, -8, Math.toRadians(90))) //2
                                 .setReversed(true)
-                                .splineToLinearHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3) //3
-                                .waitSeconds(1.5)
+                                .waitSeconds(0.1)
+                                .splineToSplineHeading(new Pose2d(-27.5, -17.2, Math.toRadians(315)), 5.5) //traj_3repeat
+                                .waitSeconds(0.1)
+                                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(180)), 3.2)
+                                .splineToSplineHeading(new Pose2d(-64.5, -11, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
 
+                                .waitSeconds(0.1)
                                 .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
-                                .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) // traj4_1
-                                .waitSeconds(1.5)
-
-                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), 5.5) //traj_3repeat
-                                .waitSeconds(1)
 //                                .splineToSplineHeading(new Pose2d(-64.5, -10, Math.toRadians(180)), 3.2) // traj4_1
 //                                .waitSeconds(1.5)
 
@@ -55,18 +49,22 @@ public class MeepMeepTesting {
                                 .lineToLinearHeading(new Pose2d(35.5, -55, Math.toRadians(125))) //pushcone 1
                                 .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90))) //2
                                 .setReversed(true)
-                                .splineToLinearHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0) //3
-                                .waitSeconds(1.5)
+                                .setTangent(24)
+                                .splineToSplineHeading(new Pose2d(48, -11, Math.toRadians(0)), Math.toRadians(0))
+                                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), Math.toRadians(0))
+                                .waitSeconds(0.1)
+                                .setReversed(true)
+                                .splineToSplineHeading(new Pose2d(27.5, -17.2, Math.toRadians(225)), 4) //traj_3repeat
+                                .waitSeconds(0.1)
+                                .splineToSplineHeading(new Pose2d(40, -11, Math.toRadians(0)), -0)
+                                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), -0) // traj4_1
+                                .waitSeconds(0.1)
 
-                                .splineToSplineHeading(new Pose2d(26.5, -17.5, Math.toRadians(225)), 4.1) //traj_3repeat
-                                .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), -0) // traj4_1
-                                .waitSeconds(1.5)
-
-                                .splineToSplineHeading(new Pose2d(26.5, -17.5, Math.toRadians(225)), 4.1) //traj_3repeat
-                                .waitSeconds(1)
-                                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), -0) // traj4_1
-                                .waitSeconds(1.5)
+                                .splineToSplineHeading(new Pose2d(27.5, -17.2, Math.toRadians(225)), 4) //traj_3repeat
+                                .waitSeconds(0.1)
+                                .splineToSplineHeading(new Pose2d(40, -11, Math.toRadians(0)), -0)
+                                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), -0) // traj4_1
+                                .waitSeconds(0.1)
 
                                 .setReversed(false)
 
@@ -97,12 +95,60 @@ public class MeepMeepTesting {
                                 .build()
                 );
 
+        RoadRunnerBotEntity stangaHighAll = new DefaultBotBuilder(meepMeep)
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+                .setConstraints(45, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
+                .followTrajectorySequence(drive ->
+                        drive.trajectorySequenceBuilder(new Pose2d(-35.5, -61, Math.toRadians(90)))
+                                .splineToSplineHeading(new Pose2d(-35.5, -30, Math.toRadians(90)), Math.toRadians(90))
+                                .splineToSplineHeading(new Pose2d(-27.5, -4, Math.toRadians(45)), Math.toRadians(45))
+                                /* traj 3 repeat */
+                                .setReversed(true)
+                                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(180)), 3.2)
+                                .splineToSplineHeading(new Pose2d(-64.5, -11, Math.toRadians(180)), Math.toRadians(180))
+                                //
+                                .waitSeconds(0.1)
+                                /* conesToMidJ */
+//                                .setReversed(true)
+//                                .splineToSplineHeading(new Pose2d(-27.5, -4, Math.toRadians(45)), 0.8)
+//                                .waitSeconds(0.1)
+                                /* parcare 1 */
+//                                .setReversed(true)
+//                                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(270)), 3.2)
+//                                .splineToSplineHeading(new Pose2d(-58, -11, Math.toRadians(270)), Math.toRadians(180))
+
+                                /* parcare 2 */
+//                                .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(90)))
+
+                                /* parcare 3 si middle high cone */
+                                .setReversed(true)
+                                .splineToSplineHeading(new Pose2d(-35, -11, Math.toRadians(180)), Math.toRadians(0))
+                                .splineToSplineHeading(new Pose2d(-4, -17.2, Math.toRadians(315)), Math.toRadians(315))
+                                .lineToLinearHeading(new Pose2d(-10, -13, Math.toRadians(270)))
+
+                                .build()
+                );
+
+
+//        RoadRunnerBotEntity stangaAllMiddle = new DefaultBotBuilder(meepMeep)
+//                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
+//                .setConstraints(39, 30, Math.toRadians(220), Math.toRadians(60), 14.7)
+//                .followTrajectorySequence(drive ->
+//                        drive.trajectorySequenceBuilder(new Pose2d(-35.5, -61, Math.toRadians(90)))
+//                                .splineToSplineHeading(new Pose2d(-35.5, -45, Math.toRadians(90)), Math.toRadians(90))
+//                                .splineToSplineHeading(new Pose2d(-27.5, -27.2, Math.toRadians(45)), Math.toRadians(45))
+//                                .build()
+//                );
+
+
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(botStanga)
+                //.addEntity(botStanga)
                 //.addEntity(botDreapta)
                 //.addEntity(testBot)
+                //.addEntity(stangaHighAll)
+                //.addEntity(stangaAllMiddle)
                 .start();
     }
 }

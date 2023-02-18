@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -60,9 +61,9 @@ public class AutoMainDreapta2 extends LinearOpMode {
     State currentState = State.IDLE;
 
     int coneOrder = 1;
-    Trajectory MidJToPos12;
     Trajectory PushCone2;
-    Trajectory PushCone3;
+    TrajectorySequence testPushCone3;
+    double conePos =-11;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -96,8 +97,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
         Pose2d StartBottom = new Pose2d(35.5, -61, Math.toRadians(90));
         drive.setPoseEstimate(StartBottom);
         //pt inchis cleste
-        robot.servoLeft.setPosition(0.12);
-        robot.servoRight.setPosition(0.3);
+        brateCleste("closed");
 
 
         /** Build trajectories **/
@@ -113,22 +113,23 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
 
         Trajectory PushCone1 = drive.trajectoryBuilder(StartToLow.end())
-                .lineToLinearHeading(new Pose2d(36.5, -56, Math.toRadians(120)))
+                .lineToLinearHeading(new Pose2d(35.5, -55, Math.toRadians(125)))
                 .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone2))
                 .build();
         PushCone2 = drive.trajectoryBuilder(PushCone1.end())
-                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90)), //prev y8
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(28, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .lineToLinearHeading(new Pose2d(35.5, -8, Math.toRadians(90)))
                 .addDisplacementMarker(0, ()->{
                     brateCleste("open");
                     runToPosition(1, "down");
                 })
-                .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
+//                .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
+                .addDisplacementMarker(()->drive.followTrajectorySequenceAsync(testPushCone3))
                 .build();
-        PushCone3 = drive.trajectoryBuilder(PushCone2.end(), true)
-                .splineToLinearHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0)
+        testPushCone3 = drive.trajectorySequenceBuilder(PushCone2.end())
+                .setReversed(true)
+                .setTangent(24)
+                .splineToSplineHeading(new Pose2d(48, -11, Math.toRadians(0)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), Math.toRadians(0))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -137,18 +138,17 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
 
-        Trajectory ConesToMidJ = drive.trajectoryBuilder(PushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(26.5, -19.5, Math.toRadians(225)), 4.1, //todo: fine tune speed to go faster, prev 28
-                        // Limit speed of trajectory
-                        SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+        Trajectory ConesToMidJ = drive.trajectoryBuilder(testPushCone3.end(), true)
+                .splineToSplineHeading(new Pose2d(27, -17.2, Math.toRadians(225)), 4)
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
                 .build();
 
-        Trajectory MidJToCones2 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0)
+        TrajectorySequence MidJToCones2 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(40, -11, Math.toRadians(0)), -0)
+                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), -0) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -156,8 +156,10 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 })
                 .build();
 
-        Trajectory MidJToCones3 = drive.trajectoryBuilder(ConesToMidJ.end(), true) //todo: fine tune speed to go faster, prev 28
-                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), 0)
+        TrajectorySequence MidJToCones3 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(40, -11, Math.toRadians(0)), -0)
+                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), -0) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -165,25 +167,25 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 })
                 .build();
 
-        Trajectory MidJtoPos11 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(48, -10, Math.toRadians(0)))
-                .addDisplacementMarker(()-> drive.followTrajectoryAsync(MidJToPos12))
-                .build();
-
-        MidJToPos12 = drive.trajectoryBuilder(MidJtoPos11.end())
-                .lineToLinearHeading(new Pose2d(57, -13, Math.toRadians(270)))
+        /*` parking positions */
+        TrajectorySequence MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                .lineToLinearHeading(new Pose2d(35, -10, Math.toRadians(225)))
+                .lineToLinearHeading(new Pose2d(58, -11, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
                 .build();
-        Trajectory MidJToPos2 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(35, -10, Math.toRadians(270)))
+
+        TrajectorySequence MidJToPos2 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                .lineToLinearHeading(new Pose2d(35, -13, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })
                 .build();
-        Trajectory MidJToPos3 = drive.trajectoryBuilder(MidJToCones3.end())
-                .lineToLinearHeading(new Pose2d(10, -10, Math.toRadians(270)))
+
+        TrajectorySequence MidJToPos3Sequence = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                .lineToLinearHeading(new Pose2d(35, -13, Math.toRadians(225)))
+                .lineToLinearHeading(new Pose2d(10, -13, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })
@@ -284,7 +286,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 case TRAJ_1:
                     if(!drive.isBusy()){
                         brateCleste("open");
-                        sleep(200);
+                        sleep(400);
                         currentState = State.TRAJ_2;
                         drive.followTrajectoryAsync(PushCone1); //prev LowToCones
                     }
@@ -294,6 +296,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                         brateCleste("open");
                         if(!robot.digitalTouch.getState()){ //if button is pressed against the wall
                             drive.breakFollowing();
+                            drive.setDrivePower(new Pose2d());
                             /**  5th cone  */
                             brateCleste("closed");
                             sleep(300);
@@ -321,15 +324,31 @@ public class AutoMainDreapta2 extends LinearOpMode {
                     if(!drive.isBusy()){
                         sleep(100);
                         brateCleste("open");
-                        sleep(100);
+                        sleep(300);
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
-                            coneOrder++;
-                            drive.followTrajectoryAsync(MidJToCones2);
+                            coneOrder=2;
+                            drive.followTrajectorySequenceAsync(MidJToCones2);
                         } else if(coneOrder==2){
-                            currentState = State.TRAJ4_2;
-                            coneOrder++;
-                            drive.followTrajectoryAsync(MidJToCones3);
+                            currentState = State.TRAJ4_1;
+                            coneOrder=3;
+                            drive.followTrajectorySequenceAsync(MidJToCones3);
+                        } else if(coneOrder==3){
+                            switch (POSITION) {
+                                case "left":
+                                    currentState = State.TRAJ_POS1;
+                                    drive.followTrajectorySequenceAsync(MidJtoPos1);
+                                    break;
+                                case "right":
+                                    currentState = State.TRAJ_POS3;
+                                    drive.followTrajectorySequenceAsync(MidJToPos3Sequence);
+                                    break;
+                                case "mid":
+                                default:
+                                    currentState = State.TRAJ_POS2;
+                                    drive.followTrajectorySequenceAsync(MidJToPos2);
+                                    break;
+                            }
                         }
                     }
                     break;
@@ -337,14 +356,17 @@ public class AutoMainDreapta2 extends LinearOpMode {
                     if(drive.isBusy()){
                         if(!robot.digitalTouch.getState()){
                             drive.breakFollowing();
+                            drive.setDrivePower(new Pose2d());
                             /**  5th cone  */
                             brateCleste("closed");
                             sleep(300);
                             runToPosition(2, "up");
                             while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                //do nothing
+                                telemetry.addLine("IN WHILE 1");
+                                telemetry.update();
                             }
                             currentState = State.TRAJ_3REPEAT;
+
                             drive.followTrajectoryAsync(ConesToMidJ);
                         }
                     }
@@ -354,9 +376,11 @@ public class AutoMainDreapta2 extends LinearOpMode {
                         sleep(300);
                         runToPosition(2, "up");
                         while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            //do nothing
+                            telemetry.addLine("IN WHILE 1");
+                            telemetry.update();
                         }
                         currentState = State.TRAJ_3REPEAT;
+
                         drive.followTrajectoryAsync(ConesToMidJ);
                     }
                     break;
@@ -364,28 +388,18 @@ public class AutoMainDreapta2 extends LinearOpMode {
                     if(drive.isBusy()){
                         if(!robot.digitalTouch.getState()){
                             drive.breakFollowing();
+                            drive.setDrivePower(new Pose2d());
                             /**  5th cone  */
                             brateCleste("closed");
                             sleep(300);
                             runToPosition(2, "up");
-                            while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
-                                //do nothing
+                            while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
+                                telemetry.addLine("IN WHILE 2");
+                                telemetry.update();
                             }
-                            coneOrder++;
-                            if(POSITION =="left"){
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            } else if(POSITION == "mid"){
-                                currentState = State.TRAJ_POS2;
-                                drive.followTrajectoryAsync(MidJToPos2);
-                            }
-                            else if(POSITION == "right"){
-                                currentState = State.TRAJ_POS3;
-                                drive.followTrajectoryAsync(MidJToPos3);
-                            } else {
-                                currentState = State.TRAJ_POS1;
-                                drive.followTrajectoryAsync(MidJtoPos11);
-                            }
+                            coneOrder=3;
+                            currentState = State.TRAJ_3REPEAT;
+                            drive.followTrajectory(ConesToMidJ);
                         }
                     }
                     if(!drive.isBusy()){
@@ -393,24 +407,13 @@ public class AutoMainDreapta2 extends LinearOpMode {
                         brateCleste("closed");
                         sleep(300);
                         runToPosition(2, "up");
-                        while(robot.bratz.getCurrentPosition() > -(int)(19 * TICKS_PER_CM_Z) && opModeIsActive()){
-                            //do nothing
+                        while(robot.bratz.getCurrentPosition() > -(int)(21 * TICKS_PER_CM_Z) && opModeIsActive()){
+                            telemetry.addLine("IN WHILE 2");
+                            telemetry.update();
                         }
-                        coneOrder++;
-                        if(POSITION =="left"){
-                            currentState = State.TRAJ_POS1;
-                            drive.followTrajectoryAsync(MidJtoPos11);
-                        } else if(POSITION == "mid"){
-                            currentState = State.TRAJ_POS2;
-                            drive.followTrajectoryAsync(MidJToPos2);
-                        }
-                        else if(POSITION == "right"){
-                            currentState = State.TRAJ_POS3;
-                            drive.followTrajectoryAsync(MidJToPos3);
-                        } else {
-                            currentState = State.TRAJ_POS1;
-                            drive.followTrajectoryAsync(MidJtoPos11);
-                        }
+                        coneOrder=3;
+                        currentState = State.TRAJ_3REPEAT;
+                        drive.followTrajectory(ConesToMidJ);
                     }
                     break;
                 case TRAJ_POS2:
@@ -501,8 +504,8 @@ public class AutoMainDreapta2 extends LinearOpMode {
             robot.servoRight.setPosition(0.4);
         }
         else if(state == "closed"){ //pt inchis
-            robot.servoLeft.setPosition(0.12);
-            robot.servoRight.setPosition(0.3);
+            robot.servoLeft.setPosition(0.17);
+            robot.servoRight.setPosition(0.35);
         }
     }
 }
