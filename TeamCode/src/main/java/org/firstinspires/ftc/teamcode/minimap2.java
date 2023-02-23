@@ -85,8 +85,7 @@ public class minimap2 extends LinearOpMode {
         /** Default motor values / Reset encoders **/
         robot.bratz.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.bratz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.servoLeft.setPosition(0.12);
-        robot.servoRight.setPosition(0.3);
+        config.brateCleste();
 
         waitForStart();
         while(!isStopRequested() && opModeIsActive()){
