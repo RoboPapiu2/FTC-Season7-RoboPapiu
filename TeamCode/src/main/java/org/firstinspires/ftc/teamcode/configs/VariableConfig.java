@@ -53,24 +53,24 @@ public class VariableConfig{
             Thread.currentThread().interrupt();
         }
     }
-    public void moveBratSus(String direction){
+    public void moveBratSus(String direction, int a){
         if(Objects.equals(direction, "up")){
             int ticks = (int)(slide.up * VariableStorage.TICKS_PER_CM_Z);
-            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setTargetPosition(-ticks+ a);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "down")){
-            robot.bratz.setTargetPosition((int)(slide.down * VariableStorage.TICKS_PER_CM_Z));
+            robot.bratz.setTargetPosition((int)(slide.down * VariableStorage.TICKS_PER_CM_Z)+a);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "middle")){
             int ticks = (int)(slide.middle * VariableStorage.TICKS_PER_CM_Z);
-            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setTargetPosition(-ticks+a);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.bratz.setPower(1);
         } else if(Objects.equals(direction, "low")){
             int ticks = (int)(slide.low * VariableStorage.TICKS_PER_CM_Z);
-            robot.bratz.setTargetPosition(-ticks);
+            robot.bratz.setTargetPosition(-ticks+a);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.bratz.setPower(0.6);
         }

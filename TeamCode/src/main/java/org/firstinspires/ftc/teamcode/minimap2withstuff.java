@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @Config
 @TeleOp
-public class minimap2 extends LinearOpMode {
+public class minimap2withstuff extends LinearOpMode {
     hardwarePapiu robot = new hardwarePapiu();
     VariableConfig config = new VariableConfig();
 
@@ -302,12 +302,15 @@ public class minimap2 extends LinearOpMode {
                     if(gamepad1.dpad_left)
                         config.moveBratSus("down", tickModifier);
 
-                    if(gamepad1.left_stick_y>0 && robot.bratz.getCurrentPosition()<=-10){
+                    if(gamepad1.left_stick_y>0){
                         robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + 40);
                         robot.bratz.setPower(1);
                     } else if(gamepad1.left_stick_y<0){
                         robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - 40);
                         robot.bratz.setPower(1);
+                    }
+                    if(gamepad1.a){
+                        tickModifier = robot.bratz.getCurrentPosition();
                     }
 
                     telemetry.addLine("Selected mode: GLISIERA\nPress back for minimap");

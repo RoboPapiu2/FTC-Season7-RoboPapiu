@@ -63,7 +63,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
     int coneOrder = 1;
     Trajectory PushCone2;
     TrajectorySequence testPushCone3;
-    double conePos =-11;
+    double conePos =-13;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -128,8 +128,8 @@ public class AutoMainDreapta2 extends LinearOpMode {
         testPushCone3 = drive.trajectorySequenceBuilder(PushCone2.end())
                 .setReversed(true)
                 .setTangent(24)
-                .splineToSplineHeading(new Pose2d(48, -11, Math.toRadians(0)), Math.toRadians(0))
-                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(48, -13, Math.toRadians(0)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), Math.toRadians(0))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -139,7 +139,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
 
         Trajectory ConesToMidJ = drive.trajectoryBuilder(testPushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(27, -17.2, Math.toRadians(225)), 4)
+                .splineToSplineHeading(new Pose2d(25.5, -16.5, Math.toRadians(225)), 4)
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
@@ -147,8 +147,8 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
         TrajectorySequence MidJToCones2 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(40, -11, Math.toRadians(0)), -0)
-                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), -0) // traj4_1
+                .splineToSplineHeading(new Pose2d(40, -13, Math.toRadians(0)), -0)
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), -0) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -158,8 +158,8 @@ public class AutoMainDreapta2 extends LinearOpMode {
 
         TrajectorySequence MidJToCones3 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(40, -11, Math.toRadians(0)), -0)
-                .splineToSplineHeading(new Pose2d(64.5, -11, Math.toRadians(0)), -0) // traj4_1
+                .splineToSplineHeading(new Pose2d(40, -13, Math.toRadians(0)), -0)
+                .splineToSplineHeading(new Pose2d(64.5, -13, Math.toRadians(0)), -0) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -177,7 +177,7 @@ public class AutoMainDreapta2 extends LinearOpMode {
                 .build();
 
         TrajectorySequence MidJToPos2 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
-                .lineToLinearHeading(new Pose2d(35, -13, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(33, -12, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })

@@ -65,8 +65,10 @@ public class AutoMainStanga1 extends LinearOpMode {
     Trajectory PushCone2;
     Trajectory PushCone3;
     TrajectorySequence testPushCone3;
+    TrajectorySequence MidJToCones2;
+    TrajectorySequence MidJToCones3;
 
-    double conePos = -11;
+    double conePos = -13.5;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -136,7 +138,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                         // Limit speed of trajectory
                         SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .splineToSplineHeading(new Pose2d(-64.5, conePos, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-68.5, conePos, Math.toRadians(180)), Math.toRadians(180))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -145,21 +147,18 @@ public class AutoMainStanga1 extends LinearOpMode {
                 .build();
 
 
-        Trajectory ConesToMidJ = drive.trajectoryBuilder(testPushCone3.end(), true)
-                .splineToSplineHeading(new Pose2d(-27.5, -17.2, Math.toRadians(315)), 5.5
-//                        // Limit speed of trajectory
-//                        ,SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-//                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
-                )
+        TrajectorySequence ConesToMidJ = drive.trajectorySequenceBuilder(testPushCone3.end())
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(-28, -18.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
                 .build();
-
-        TrajectorySequence MidJToCones2 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
+        MidJToCones2 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(180)), 3.2)
-                .splineToSplineHeading(new Pose2d(-64.5, -11, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
+                .splineToSplineHeading(new Pose2d(-55, conePos-0.2, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-68.5, conePos-0.2, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -167,10 +166,20 @@ public class AutoMainStanga1 extends LinearOpMode {
                 })
                 .build();
 
-        TrajectorySequence MidJToCones3 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
+
+        TrajectorySequence ConesToMidJ2 = drive.trajectorySequenceBuilder(MidJToCones2.end())
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(-50, -11, Math.toRadians(180)), 3.2)
-                .splineToSplineHeading(new Pose2d(-64.5, -11, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
+                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(-27.8, -19.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                .addDisplacementMarker(2,()->{
+                    runToPosition(3,"up");
+                })
+                .build();
+
+        MidJToCones3 = drive.trajectorySequenceBuilder(ConesToMidJ2.end()) //todo: fine tune speed to go faster, prev 28
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(-55, conePos-0.4, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-68.5, conePos-0.4, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -178,10 +187,23 @@ public class AutoMainStanga1 extends LinearOpMode {
                 })
                 .build();
 
+        TrajectorySequence ConesToMidJ3 = drive.trajectorySequenceBuilder(MidJToCones3.end())
+                .setReversed(true)
+                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(-27.5, -20.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                .addDisplacementMarker(2,()->{
+                    runToPosition(3,"up");
+                })
+                .build();
+
+
+
+
+
         /*` parking positions */
         TrajectorySequence MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
                 .lineToLinearHeading(new Pose2d(-35, -10, Math.toRadians(315)))
-                .lineToLinearHeading(new Pose2d(-58, -11, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-58, conePos, Math.toRadians(270)))
                 .addDisplacementMarker(1.5, ()->{
                     runToPosition(1, "down");
                 })
@@ -196,7 +218,7 @@ public class AutoMainStanga1 extends LinearOpMode {
 
         TrajectorySequence MidJToPos3Sequence = drive.trajectorySequenceBuilder(ConesToMidJ.end())
                 .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(315)))
-                .lineToLinearHeading(new Pose2d(-10, -13, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-10, conePos, Math.toRadians(270)))
                 .addDisplacementMarker(2, ()->{
                     runToPosition(1, "down");
                 })
@@ -316,7 +338,15 @@ public class AutoMainStanga1 extends LinearOpMode {
                                 //do nothing
                             }
                             currentState = State.TRAJ_3REPEAT;
-                            drive.followTrajectoryAsync(ConesToMidJ);
+//                            ConesToMidJ = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+//                                    .setReversed(true)
+//                                    .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+//                                    .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+//                                    .addDisplacementMarker(2,()->{
+//                                        runToPosition(3,"up");
+//                                    })
+//                                    .build();
+                            drive.followTrajectorySequenceAsync(ConesToMidJ);
                         }
                     }
                     else if(!drive.isBusy()){
@@ -328,7 +358,15 @@ public class AutoMainStanga1 extends LinearOpMode {
                             //do nothing
                         }
                         currentState = State.TRAJ_3REPEAT;
-                        drive.followTrajectoryAsync(ConesToMidJ);
+//                        ConesToMidJ = drive.trajectorySequenceBuilder(testPushCone3.end())
+//                                .setReversed(true)
+//                                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+//                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+//                                .addDisplacementMarker(2,()->{
+//                                    runToPosition(3,"up");
+//                                })
+//                                .build();
+                        drive.followTrajectorySequenceAsync(ConesToMidJ);
                     }
                     break;
                 case TRAJ_3REPEAT:
@@ -338,25 +376,43 @@ public class AutoMainStanga1 extends LinearOpMode {
                         sleep(300);
                         if(coneOrder==1){
                             currentState = State.TRAJ4_1;
-                            coneOrder=2;
                             drive.followTrajectorySequenceAsync(MidJToCones2);
                         } else if(coneOrder==2){
                             currentState = State.TRAJ4_1;
-                            coneOrder=3;
                             drive.followTrajectorySequenceAsync(MidJToCones3);
                         } else if(coneOrder==3){
                             switch (POSITION) {
                                 case "left":
                                     currentState = State.TRAJ_POS1;
+                                    MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                                            .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(315)))
+                                            .lineToLinearHeading(new Pose2d(-58, -15, Math.toRadians(270)))
+                                            .addDisplacementMarker(1.5, ()->{
+                                                runToPosition(1, "down");
+                                            })
+                                            .build();
                                     drive.followTrajectorySequenceAsync(MidJtoPos1);
                                     break;
                                 case "right":
                                     currentState = State.TRAJ_POS3;
+                                    MidJToPos3Sequence = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                                            .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(315)))
+                                            .lineToLinearHeading(new Pose2d(-10, -15, Math.toRadians(270)))
+                                            .addDisplacementMarker(2, ()->{
+                                                runToPosition(1, "down");
+                                            })
+                                            .build();
                                     drive.followTrajectorySequenceAsync(MidJToPos3Sequence);
                                     break;
                                 case "mid":
                                 default:
                                     currentState = State.TRAJ_POS2;
+                                    MidJToPos2 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                                            .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(270)))
+                                            .addDisplacementMarker(2, ()->{
+                                                runToPosition(1, "down");
+                                            })
+                                            .build();
                                     drive.followTrajectorySequenceAsync(MidJToPos2);
                                     break;
                             }
@@ -377,8 +433,22 @@ public class AutoMainStanga1 extends LinearOpMode {
                                 telemetry.update();
                             }
                             currentState = State.TRAJ_3REPEAT;
-
-                            drive.followTrajectoryAsync(ConesToMidJ);
+//                            ConesToMidJ = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+//                                    .setReversed(true)
+//                                    .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+//                                    .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+//                                    .addDisplacementMarker(2,()->{
+//                                        runToPosition(3,"up");
+//                                    })
+//                                    .build();
+                            if(coneOrder==1) {
+                                drive.followTrajectorySequenceAsync(ConesToMidJ2);
+                                coneOrder=2;
+                            }
+                            else if(coneOrder==2) {
+                                drive.followTrajectorySequenceAsync(ConesToMidJ3);
+                                coneOrder=3;
+                            }
                         }
                     }
                     if(!drive.isBusy()){
@@ -391,8 +461,18 @@ public class AutoMainStanga1 extends LinearOpMode {
                             telemetry.update();
                         }
                         currentState = State.TRAJ_3REPEAT;
-
-                        drive.followTrajectoryAsync(ConesToMidJ);
+//                        ConesToMidJ = drive.trajectorySequenceBuilder(testPushCone3.end())
+//                                .setReversed(true)
+//                                .splineToSplineHeading(new Pose2d(-50, -13, Math.toRadians(180)), Math.toRadians(0))
+//                                .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+//                                .addDisplacementMarker(2,()->{
+//                                    runToPosition(3,"up");
+//                                })
+//                                .build();
+                        if(coneOrder==1)
+                            drive.followTrajectorySequenceAsync(ConesToMidJ2);
+                        else if(coneOrder==2)
+                            drive.followTrajectorySequenceAsync(ConesToMidJ3);
                     }
                     break;
                 case TRAJ4_2:
@@ -410,7 +490,15 @@ public class AutoMainStanga1 extends LinearOpMode {
                             }
                             coneOrder=3;
                             currentState = State.TRAJ_3REPEAT;
-                            drive.followTrajectory(ConesToMidJ);
+//                            ConesToMidJ = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
+//                                    .setReversed(true)
+//                                    .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+//                                    .splineToSplineHeading(new Pose2d(-27.5, -17.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+//                                    .addDisplacementMarker(2,()->{
+//                                        runToPosition(3,"up");
+//                                    })
+//                                    .build();
+                            drive.followTrajectorySequenceAsync(ConesToMidJ3);
                         }
                     }
                     if(!drive.isBusy()){
@@ -424,7 +512,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                         }
                         coneOrder=3;
                         currentState = State.TRAJ_3REPEAT;
-                        drive.followTrajectory(ConesToMidJ);
+                        drive.followTrajectorySequenceAsync(ConesToMidJ3);
                     }
                     break;
                 case TRAJ_POS2:
@@ -440,6 +528,7 @@ public class AutoMainStanga1 extends LinearOpMode {
 
             /** Transfer last pose to TeleOP */
             TransferPose.currentPose = drive.getPoseEstimate();
+            TransferPose.glisieraTicks = robot.bratz.getCurrentPosition();
 
             drive.update();
 
