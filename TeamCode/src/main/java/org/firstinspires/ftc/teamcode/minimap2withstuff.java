@@ -252,6 +252,10 @@ public class minimap2withstuff extends LinearOpMode {
                     break;
                 case glisiera:
 
+                    if(gamepad1.a){
+                        tickModifier = -robot.bratz.getCurrentPosition();
+                    }
+
                     if(gamepad2.dpad_up)
                         config.moveBratSus("up",tickModifier);
 
@@ -302,16 +306,10 @@ public class minimap2withstuff extends LinearOpMode {
                     if(gamepad1.dpad_left)
                         config.moveBratSus("down", tickModifier);
 
-                    if(gamepad1.left_stick_y>0){
-                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() + 40);
-                        robot.bratz.setPower(1);
-                    } else if(gamepad1.left_stick_y<0){
-                        robot.bratz.setTargetPosition(robot.bratz.getCurrentPosition() - 40);
-                        robot.bratz.setPower(1);
-                    }
-                    if(gamepad1.a){
-                        tickModifier = robot.bratz.getCurrentPosition();
-                    }
+                    if(gamepad1.left_stick_y>0) THING("up");
+                    else if(gamepad1.left_stick_y<0) THING("down");
+                    else if(gamepad1.left_stick_y==0) THING("no");
+
 
                     telemetry.addLine("Selected mode: GLISIERA\nPress back for minimap");
                     telemetry.addData("brat ticks: ", robot.bratz.getCurrentPosition());
@@ -333,6 +331,8 @@ public class minimap2withstuff extends LinearOpMode {
             // Draw bot on canvas
             fieldOverlay.setStroke("#3F51B5");
             DashboardUtil.drawRobot(fieldOverlay, poseEstimate);
+            telemetry.addData("AAA", gamepad1.left_stick_y);
+            telemetry.addData("afmaofms", tickModifier);
 
             // Draw the target on the field
             fieldOverlay.setStroke("#dd2c00");
@@ -439,6 +439,15 @@ public class minimap2withstuff extends LinearOpMode {
         telemetry.addLine(message);
         telemetry.addData("Current mat: ", indexOfMat);
         telemetry.update();
+    }
+
+    public void THING(String direction){
+            robot.bratz.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            if (direction == "up") {
+                robot.bratz.setPower(1);
+            } else if (direction == "down") {
+                robot.bratz.setPower(-1);
+            } else if(direction== "no")robot.bratz.setPower(0);
     }
 
     public void setTargetJunction(){

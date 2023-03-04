@@ -72,7 +72,8 @@ public class VariableConfig{
             int ticks = (int)(slide.low * VariableStorage.TICKS_PER_CM_Z);
             robot.bratz.setTargetPosition(-ticks+a);
             robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.bratz.setPower(0.6);
+            robot.bratz.setPower(1);
         }
+        robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 }

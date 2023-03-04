@@ -68,7 +68,7 @@ public class AutoMainStanga1 extends LinearOpMode {
     TrajectorySequence MidJToCones2;
     TrajectorySequence MidJToCones3;
 
-    double conePos = -13.5;
+    double conePos = -14.5;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -128,6 +128,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                     brateCleste("open");
                     runToPosition(1, "down");
                 })
+                .addTemporalMarker(0.5,.01, ()->brateCleste("closed"))
 //                .addDisplacementMarker(()->drive.followTrajectoryAsync(PushCone3))
                 .addDisplacementMarker(()->drive.followTrajectorySequenceAsync(testPushCone3))
                 .build();
@@ -139,6 +140,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                         SampleMecanumDrive.getVelocityConstraint(34, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .splineToSplineHeading(new Pose2d(-68.5, conePos, Math.toRadians(180)), Math.toRadians(180))
+                .addDisplacementMarker(0, ()->brateCleste("open"))
                 .addDisplacementMarker(1, ()->{
                     // grab 5th cone
                     int ticks = (int)(8 * TICKS_PER_CM_Z);
@@ -150,15 +152,15 @@ public class AutoMainStanga1 extends LinearOpMode {
         TrajectorySequence ConesToMidJ = drive.trajectorySequenceBuilder(testPushCone3.end())
                 .setReversed(true)
                 .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
-                .splineToSplineHeading(new Pose2d(-28, -18.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                .splineToSplineHeading(new Pose2d(-28.5, -18.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
                 .build();
         MidJToCones2 = drive.trajectorySequenceBuilder(ConesToMidJ.end()) //todo: fine tune speed to go faster, prev 28
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(-55, conePos-0.2, Math.toRadians(180)), Math.toRadians(180))
-                .splineToSplineHeading(new Pose2d(-68.5, conePos-0.2, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
+                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-68.5, conePos, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(6 * TICKS_PER_CM_Z);
@@ -170,7 +172,7 @@ public class AutoMainStanga1 extends LinearOpMode {
         TrajectorySequence ConesToMidJ2 = drive.trajectorySequenceBuilder(MidJToCones2.end())
                 .setReversed(true)
                 .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
-                .splineToSplineHeading(new Pose2d(-27.8, -19.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                .splineToSplineHeading(new Pose2d(-28.3, -19, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
@@ -178,8 +180,8 @@ public class AutoMainStanga1 extends LinearOpMode {
 
         MidJToCones3 = drive.trajectorySequenceBuilder(ConesToMidJ2.end()) //todo: fine tune speed to go faster, prev 28
                 .setReversed(true)
-                .splineToSplineHeading(new Pose2d(-55, conePos-0.4, Math.toRadians(180)), Math.toRadians(180))
-                .splineToSplineHeading(new Pose2d(-68.5, conePos-0.4, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
+                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(180))
+                .splineToSplineHeading(new Pose2d(-68.5, conePos, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
                 .addDisplacementMarker(2, ()->{
                     // grab 5th cone
                     int ticks = (int)(4 * TICKS_PER_CM_Z);
@@ -190,7 +192,7 @@ public class AutoMainStanga1 extends LinearOpMode {
         TrajectorySequence ConesToMidJ3 = drive.trajectorySequenceBuilder(MidJToCones3.end())
                 .setReversed(true)
                 .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
-                .splineToSplineHeading(new Pose2d(-27.5, -20.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                .splineToSplineHeading(new Pose2d(-28, -19.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
@@ -326,7 +328,6 @@ public class AutoMainStanga1 extends LinearOpMode {
                     break;
                 case TRAJ_2:
                     if(drive.isBusy()){
-                        brateCleste("open");
                         if(!robot.digitalTouch.getState()){ //if button is pressed against the wall
                             drive.breakFollowing();
                             drive.setDrivePower(new Pose2d());
@@ -384,7 +385,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                             switch (POSITION) {
                                 case "left":
                                     currentState = State.TRAJ_POS1;
-                                    MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                                    MidJtoPos1 = drive.trajectorySequenceBuilder(ConesToMidJ2.end())
                                             .lineToLinearHeading(new Pose2d(-35, -15, Math.toRadians(315)))
                                             .lineToLinearHeading(new Pose2d(-58, -15, Math.toRadians(270)))
                                             .addDisplacementMarker(1.5, ()->{
@@ -395,7 +396,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                                     break;
                                 case "right":
                                     currentState = State.TRAJ_POS3;
-                                    MidJToPos3Sequence = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                                    MidJToPos3Sequence = drive.trajectorySequenceBuilder(ConesToMidJ2.end())
                                             .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(315)))
                                             .lineToLinearHeading(new Pose2d(-10, -15, Math.toRadians(270)))
                                             .addDisplacementMarker(2, ()->{
@@ -407,7 +408,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                                 case "mid":
                                 default:
                                     currentState = State.TRAJ_POS2;
-                                    MidJToPos2 = drive.trajectorySequenceBuilder(ConesToMidJ.end())
+                                    MidJToPos2 = drive.trajectorySequenceBuilder(ConesToMidJ2.end())
                                             .lineToLinearHeading(new Pose2d(-35, -13, Math.toRadians(270)))
                                             .addDisplacementMarker(2, ()->{
                                                 runToPosition(1, "down");
@@ -583,7 +584,6 @@ public class AutoMainStanga1 extends LinearOpMode {
             switch(level){
                 case 1:
                     robot.bratz.setTargetPosition(0);
-                    brateCleste("closed");
                     break;
                 case 2:
                     ticks = (int)((18+24) * TICKS_PER_CM_Z);
@@ -596,7 +596,7 @@ public class AutoMainStanga1 extends LinearOpMode {
             }
         }
         robot.bratz.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.bratz.setPower(0.8);
+        robot.bratz.setPower(1);
     }
     public void brateCleste(String state) {
         if(state == "open"){ //pt deschis

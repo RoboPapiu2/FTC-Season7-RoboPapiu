@@ -20,11 +20,12 @@ public class MeepMeepTesting {
 
                                 .setReversed(true)
                                 .waitSeconds(0.1)
-                                .splineToSplineHeading(new Pose2d(-27.5, -17.2, Math.toRadians(315)), 5.82) //traj_3repeat
-                                .waitSeconds(0.1)
                                 .setReversed(true)
-                                .splineToSplineHeading(new Pose2d(-55, conePos, Math.toRadians(180)), Math.toRadians(180))
-                                .splineToSplineHeading(new Pose2d(-68.5, conePos, Math.toRadians(180)), Math.toRadians(180))
+                                .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
+                                .splineToSplineHeading(new Pose2d(-28.5, -18.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                                .setReversed(true)
+                                .splineToSplineHeading(new Pose2d(-50, conePos-0.2, Math.toRadians(180)), Math.toRadians(180))
+                                .splineToSplineHeading(new Pose2d(-68.5, conePos-0.2, Math.toRadians(180)), Math.toRadians(180)) // traj4_1
 
                                 .waitSeconds(0.1)
                                 .setReversed(true)
