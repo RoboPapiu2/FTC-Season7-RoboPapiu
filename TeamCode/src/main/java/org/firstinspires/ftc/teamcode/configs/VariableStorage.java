@@ -15,7 +15,7 @@ public class VariableStorage {
     //double TICKS_PER_CM_Z = GEAR_MOTOR_40_TICKS / (WHEEL_DIAMETER_CM * PI);
     public static double TICKS_PER_CM_Z = GEAR_MOTOR_GOBILDA5202_TICKS / (WHEEL_DIAMETER_CM * PI);
 
-    public static double cOpen1=0,cOpen2=0.4,cClosed1=0.12,cClosed2=0.3;
+    public static double cOpen1=0,cOpen2=0.4,cClosed1=0.13,cClosed2=0.28;
     public static double down=0,low=25,middle=43,up=60;
 
     public static class ClesteConfig {

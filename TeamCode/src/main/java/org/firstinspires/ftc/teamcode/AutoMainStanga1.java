@@ -192,7 +192,7 @@ public class AutoMainStanga1 extends LinearOpMode {
         TrajectorySequence ConesToMidJ3 = drive.trajectorySequenceBuilder(MidJToCones3.end())
                 .setReversed(true)
                 .splineToSplineHeading(new Pose2d(-50, conePos, Math.toRadians(180)), Math.toRadians(0))
-                .splineToSplineHeading(new Pose2d(-28, -19.5, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
+                .splineToSplineHeading(new Pose2d(-28.3, -19, Math.toRadians(315)), Math.toRadians(-30)) //traj_3repeat
                 .addDisplacementMarker(2,()->{
                     runToPosition(3,"up");
                 })
@@ -476,7 +476,7 @@ public class AutoMainStanga1 extends LinearOpMode {
                             drive.followTrajectorySequenceAsync(ConesToMidJ3);
                     }
                     break;
-                case TRAJ4_2:
+                    case TRAJ4_2:
                     if(drive.isBusy()){
                         if(!robot.digitalTouch.getState()){
                             drive.breakFollowing();
